@@ -31,12 +31,12 @@ export default function TurnByTurnNavigator() {
         activeNavigator.activityXp || 10
       );
       Alert.alert(
-        '🎉 ยินดีด้วย!',
-        `คุณเดินทางถึง ${activeNavigator.activityRoom || activeNavigator.building} และเช็คอินกิจกรรม "${activeNavigator.activityTitle}" สำเร็จแล้ว! (+${activeNavigator.activityXp || 10} XP)`
+        '🎉 Congratulations!',
+        `You arrived at ${activeNavigator.activityRoom || activeNavigator.building} and checked in for "${activeNavigator.activityTitle}"! (+${activeNavigator.activityXp || 10} XP)`
       );
     } else {
       checkInFacultyStamp(activeNavigator.facultyId);
-      Alert.alert('🎉 ถึงจุดหมายแล้ว!', `คุณเดินทางถึง ${activeNavigator.facultyName} และรับ Stamp สำเร็จ!`);
+      Alert.alert('🎉 You have arrived!', `You arrived at ${activeNavigator.facultyName} and received a Stamp!`);
     }
     clearNavigation();
   };
@@ -50,12 +50,12 @@ export default function TurnByTurnNavigator() {
         </View>
         <View style={{ flex: 1, marginLeft: 12 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={styles.bannerTag}>NAVIGATOR • ขั้น {activeNavigator.currentStepIndex + 1}/{activeNavigator.steps.length}</Text>
+            <Text style={styles.bannerTag}>NAVIGATOR • Step {activeNavigator.currentStepIndex + 1}/{activeNavigator.steps.length}</Text>
             {currentStep.distance != null && (
               <Text style={styles.stepDistanceBadge}>
                 {currentStep.distance < 1000
-                  ? `${currentStep.distance} ม.`
-                  : `${(currentStep.distance / 1000).toFixed(1)} กม.`}
+                  ? `${currentStep.distance} m`
+                  : `${(currentStep.distance / 1000).toFixed(1)} km`}
               </Text>
             )}
           </View>
@@ -63,7 +63,7 @@ export default function TurnByTurnNavigator() {
           {/* Next step preview */}
           {activeNavigator.steps[activeNavigator.currentStepIndex + 1] && (
             <Text style={styles.nextStepText} numberOfLines={1}>
-              ต่อไป: {activeNavigator.steps[activeNavigator.currentStepIndex + 1].icon} {activeNavigator.steps[activeNavigator.currentStepIndex + 1].instruction}
+              Next: {activeNavigator.steps[activeNavigator.currentStepIndex + 1].icon} {activeNavigator.steps[activeNavigator.currentStepIndex + 1].instruction}
             </Text>
           )}
         </View>
@@ -91,7 +91,7 @@ export default function TurnByTurnNavigator() {
         {activeNavigator.activityTitle && (
           <View style={styles.activityHighlight}>
             <Text style={styles.actTagText}>
-              🎯 กิจกรรม: {activeNavigator.activityTitle} (+{activeNavigator.activityXp || 10} XP)
+              🎯 Activity: {activeNavigator.activityTitle} (+{activeNavigator.activityXp || 10} XP)
             </Text>
           </View>
         )}
@@ -99,7 +99,7 @@ export default function TurnByTurnNavigator() {
         {/* Metrics Row */}
         <View style={styles.metricsRow}>
           <View style={styles.metricCol}>
-            <Text style={styles.metricLabel}>🚶 ระยะทางคงเหลือ</Text>
+            <Text style={styles.metricLabel}>🚶 Distance Left</Text>
             <Text style={styles.metricValue}>
               {activeNavigator.totalDistance < 1000
                 ? `${activeNavigator.totalDistance} m`
@@ -110,16 +110,16 @@ export default function TurnByTurnNavigator() {
           <View style={styles.metricDivider} />
 
           <View style={styles.metricCol}>
-            <Text style={styles.metricLabel}>⏱️ เวลาโดยประมาณ</Text>
-            <Text style={styles.metricValue}>{activeNavigator.totalTimeMin} นาที</Text>
+            <Text style={styles.metricLabel}>⏱️ Est. Time</Text>
+            <Text style={styles.metricValue}>{activeNavigator.totalTimeMin} min</Text>
           </View>
 
           <View style={styles.metricDivider} />
 
           <View style={styles.metricCol}>
-            <Text style={styles.metricLabel}>สถานะ</Text>
+            <Text style={styles.metricLabel}>Status</Text>
             <Text style={[styles.metricValue, activeNavigator.isArrived && { color: '#10B981' }]}>
-              {activeNavigator.isArrived ? 'ถึงแล้ว! ✓' : 'กำลังนำทาง'}
+              {activeNavigator.isArrived ? 'Arrived! ✓' : 'Navigating'}
             </Text>
           </View>
         </View>
@@ -143,7 +143,7 @@ export default function TurnByTurnNavigator() {
             }}
             activeOpacity={0.8}
           >
-            <Text style={styles.simBtnText}>🔄 อัปเดตเส้นทาง</Text>
+            <Text style={styles.simBtnText}>🔄 Refresh Route</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -155,7 +155,7 @@ export default function TurnByTurnNavigator() {
             activeOpacity={0.85}
           >
             <Text style={styles.checkInNavBtnText}>
-              {activeNavigator.isArrived ? '🎉 ถึงแล้ว! เช็คอิน' : '📍 ฉันถึงแล้ว!'}
+              {activeNavigator.isArrived ? '🎉 Arrived! Check-in' : '📍 I have arrived!'}
             </Text>
           </TouchableOpacity>
         </View>

@@ -42,7 +42,7 @@ export default function StaffScreen() {
 
   const handleLogin = () => {
     if (!selectedFacultyId) {
-      setErrorMsg('กรุณาเลือกคณะของคุณก่อน');
+      setErrorMsg('Please select your faculty first');
       return;
     }
     const correctCode = STAFF_CODES[selectedFacultyId];
@@ -51,12 +51,12 @@ export default function StaffScreen() {
       setStaffSession({
         facultyId: selectedFacultyId,
         facultyCode: selectedFaculty.code,
-        facultyName: selectedFaculty.name,
+        facultyName: selectedFaculty.nameEn,
         facultyColor: selectedFaculty.color,
         facultyBadge: selectedFaculty.badgeIcon,
       });
     } else {
-      setErrorMsg('❌ รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง');
+      setErrorMsg('❌ Incorrect staff code. Please try again.');
       // Shake animation
       Animated.sequence([
         Animated.timing(shakeAnim, { toValue: 10, duration: 60, useNativeDriver: true }),
@@ -70,10 +70,10 @@ export default function StaffScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('ออกจากระบบ Staff', 'ต้องการออกจากระบบหรือไม่?', [
-      { text: 'ยกเลิก', style: 'cancel' },
+    Alert.alert('Staff Logout', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
       {
-        text: 'ออกจากระบบ',
+        text: 'Log Out',
         style: 'destructive',
         onPress: () => {
           setStaffSession(null);
@@ -96,14 +96,14 @@ export default function StaffScreen() {
           <Text style={styles.dashFacultyName}>{staffSession.facultyName}</Text>
           <Text style={styles.dashSubtitle}>Staff Dashboard — Open House 2026</Text>
           <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-            <Text style={styles.logoutBtnText}>ออกจากระบบ Staff</Text>
+            <Text style={styles.logoutBtnText}>Staff Logout</Text>
           </TouchableOpacity>
         </View>
 
         {/* QR Code Display */}
         <Animated.View style={[styles.qrCard, { opacity: fadeAnim, transform: [{ scale: fadeAnim }] }]}>
-          <Text style={styles.qrTitle}>📲 QR Code ประจำคณะ</Text>
-          <Text style={styles.qrSubtitle}>ให้น้องที่มาเยี่ยมชมสแกนเพื่อรับ Stamp + XP</Text>
+          <Text style={styles.qrTitle}>📲 Faculty QR Code</Text>
+          <Text style={styles.qrSubtitle}>Let visitors scan to receive Stamp + XP</Text>
 
           <View style={[styles.qrWrapper, { borderColor: staffSession.facultyColor }]}>
             <QRCode
@@ -127,13 +127,13 @@ export default function StaffScreen() {
             </Text>
           </View>
 
-          <Text style={styles.qrNote}>⏱️ QR Code refresh ทุก 1 นาทีเพื่อความปลอดภัย</Text>
+          <Text style={styles.qrNote}>⏱️ QR Code refreshes every minute for security</Text>
         </Animated.View>
 
         {/* Activity list */}
         {fac && (
           <View style={styles.activitiesCard}>
-            <Text style={styles.activitiesTitle}>🎯 กิจกรรมที่น้องสามารถเช็คอินได้</Text>
+            <Text style={styles.activitiesTitle}>🎯 Activities available for check-in</Text>
             {fac.activities.map((act) => (
               <View key={act.id} style={styles.activityRow}>
                 <View style={[styles.xpBadge, { backgroundColor: staffSession.facultyColor }]}>
@@ -150,11 +150,11 @@ export default function StaffScreen() {
 
         {/* Instructions */}
         <View style={styles.instructionCard}>
-          <Text style={styles.instructionTitle}>📋 วิธีใช้งาน</Text>
-          <Text style={styles.instructionStep}>1️⃣  แสดงหน้าจอนี้ให้น้องที่มาเยี่ยมชมซุ้ม</Text>
-          <Text style={styles.instructionStep}>2️⃣  น้องเปิดแอปแล้วกด 📷 "สแกน QR"</Text>
-          <Text style={styles.instructionStep}>3️⃣  น้องส่องกล้องไปที่ QR Code ด้านบน</Text>
-          <Text style={styles.instructionStep}>4️⃣  ระบบยืนยันการมาเยือนและแจก Stamp + XP ทันที</Text>
+          <Text style={styles.instructionTitle}>📋 How to Use</Text>
+          <Text style={styles.instructionStep}>1️⃣  Show this screen to visitors at the booth</Text>
+          <Text style={styles.instructionStep}>2️⃣  Visitor opens the app and taps 📷 "Scan QR"</Text>
+          <Text style={styles.instructionStep}>3️⃣  Visitor points camera at the QR Code above</Text>
+          <Text style={styles.instructionStep}>4️⃣  System verifies visit and awards Stamp + XP instantly</Text>
         </View>
       </ScrollView>
     );
@@ -167,20 +167,20 @@ export default function StaffScreen() {
       <View style={styles.loginHero}>
         <Text style={styles.loginHeroEmoji}>👔</Text>
         <Text style={styles.loginHeroTitle}>Staff Portal</Text>
-        <Text style={styles.loginHeroSub}>เข้าสู่ระบบด้วย Staff Code ประจำคณะ{'\n'}เพื่อแสดง QR Code ให้น้องสแกน</Text>
+        <Text style={styles.loginHeroSub}>Login with your Faculty Staff Code{'\n'}to display the QR Code for visitors to scan</Text>
       </View>
 
       {/* Login Card */}
       <Animated.View style={[styles.loginCard, { transform: [{ translateX: shakeAnim }] }]}>
         {/* Faculty Picker */}
-        <Text style={styles.fieldLabel}>เลือกคณะที่คุณดูแล</Text>
+        <Text style={styles.fieldLabel}>Select your faculty</Text>
         <TouchableOpacity
           style={[styles.facultyPickerBtn, selectedFaculty && { borderColor: selectedFaculty.color }]}
           onPress={() => setShowFacultyPicker(!showFacultyPicker)}
           activeOpacity={0.8}
         >
           <Text style={[styles.facultyPickerText, !selectedFaculty && { color: '#94A3B8' }]}>
-            {selectedFaculty ? `${selectedFaculty.badgeIcon} ${selectedFaculty.name}` : 'กดเพื่อเลือกคณะ...'}
+            {selectedFaculty ? `${selectedFaculty.badgeIcon} ${selectedFaculty.nameEn}` : 'Tap to select faculty...'}
           </Text>
           <Text style={styles.pickerArrow}>{showFacultyPicker ? '▲' : '▼'}</Text>
         </TouchableOpacity>
@@ -200,7 +200,7 @@ export default function StaffScreen() {
                 >
                   <Text style={styles.dropdownIcon}>{fac.badgeIcon}</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.dropdownName, selectedFacultyId === fac.id && { color: fac.color }]}>{fac.name}</Text>
+                    <Text style={[styles.dropdownName, selectedFacultyId === fac.id && { color: fac.color }]}>{fac.nameEn}</Text>
                     <Text style={styles.dropdownCode}>{fac.code} — {fac.building}</Text>
                   </View>
                   {selectedFacultyId === fac.id && (
@@ -235,16 +235,16 @@ export default function StaffScreen() {
           disabled={!selectedFacultyId}
           activeOpacity={0.85}
         >
-          <Text style={styles.loginBtnText}>🔐 เข้าสู่ระบบ Staff</Text>
+          <Text style={styles.loginBtnText}>🔐 Staff Login</Text>
         </TouchableOpacity>
       </Animated.View>
 
       {/* Info */}
       <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>ℹ️ สำหรับเจ้าหน้าที่และรุ่นพี่ประจำซุ้ม</Text>
+        <Text style={styles.infoTitle}>ℹ️ For staff and senior students at booths</Text>
         <Text style={styles.infoText}>
-          Staff Code จะถูกแจ้งในวันงาน Open House โดยทีมงาน KMUTNB{'\n'}
-          น้องที่สแกน QR Code นี้จะได้รับ Stamp ประจำคณะและ XP โดยอัตโนมัติ
+          Staff Codes will be provided on the event day by the KMUTNB team.{'\n'}
+          Visitors scanning this QR Code will automatically receive a faculty stamp and XP.
         </Text>
       </View>
     </ScrollView>

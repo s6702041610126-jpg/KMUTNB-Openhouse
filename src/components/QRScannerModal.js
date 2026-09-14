@@ -82,7 +82,7 @@ export default function QRScannerModal({ visible, onClose }) {
           return;
         }
       } catch {}
-      setErrorMessage('QR Code ไม่ถูกต้องสำหรับ Staff Scanner');
+      setErrorMessage('Invalid QR Code for Staff Scanner');
       return;
     }
 
@@ -98,16 +98,16 @@ export default function QRScannerModal({ visible, onClose }) {
         }
         showSuccess({
           icon: '🎉',
-          title: 'เช็คอินสำเร็จ!',
+          title: 'Check-in Successful!',
           sub: fac.name,
           detail: `📍 ${fac.building}\n✨ +${fac.activities[0]?.xp || 10} XP & Stamp ✓`,
           color: fac.color,
         });
       } else {
-        setErrorMessage('ไม่พบข้อมูลคณะในระบบ');
+        setErrorMessage('Faculty data not found');
       }
     } else {
-      setErrorMessage(result.reason || 'QR Code ไม่ถูกต้อง');
+      setErrorMessage(result.reason || 'Invalid QR Code');
       setTimeout(() => { setScanned(false); setErrorMessage(null); }, 2500);
     }
   };
@@ -118,7 +118,7 @@ export default function QRScannerModal({ visible, onClose }) {
     checkInFacultyStamp(faculty.id);
     showSuccess({
       icon: '🎉',
-      title: 'เช็คอินสำเร็จ!',
+      title: 'Check-in Successful!',
       sub: `${faculty.name} — ${activity.title}`,
       detail: `📍 ${activity.room}\n✨ +${activity.xp} XP & Stamp ✓`,
       color: faculty.color,
@@ -149,9 +149,9 @@ export default function QRScannerModal({ visible, onClose }) {
     if (res.success) {
       showSuccess({
         icon: '🟢',
-        title: 'ยืนยันโดยเจ้าหน้าที่สำเร็จ!',
+        title: 'Confirmed by Staff successfully!',
         sub: res.message,
-        detail: `ผู้ยืนยัน: ${userProfile.name} (Staff)`,
+        detail: `Confirmed by: ${userProfile.name} (Staff)`,
         color: '#10B981',
       });
       setStaffScanData(null);
@@ -170,7 +170,7 @@ export default function QRScannerModal({ visible, onClose }) {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>
-              {userProfile.role === 'staff' ? '📱 Staff Scanner' : '📷 สแกน QR Code เช็คอิน'}
+              {userProfile.role === 'staff' ? '📱 Staff Scanner' : '📷 Scan QR Code Check-in'}
             </Text>
             <TouchableOpacity style={styles.closeBtn} onPress={handleReset}>
               <Text style={styles.closeBtnText}>✕</Text>
@@ -189,36 +189,36 @@ export default function QRScannerModal({ visible, onClose }) {
                 <Text style={styles.successSub}>{successMessage.sub}</Text>
                 <Text style={styles.successDetail}>{successMessage.detail}</Text>
                 <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: successMessage.color || '#F15A24' }]} onPress={handleReset}>
-                  <Text style={styles.confirmBtnText}>✓ ตกลง / ปิดหน้าต่าง</Text>
+                  <Text style={styles.confirmBtnText}>✓ OK / Close</Text>
                 </TouchableOpacity>
               </Animated.View>
 
             ) : staffScanData ? (
               /* ── STAFF CONFIRM VIEW ── */
               <View style={styles.inspectCard}>
-                <Text style={styles.inspectHeader}>📋 ข้อมูลการสแกน</Text>
+                <Text style={styles.inspectHeader}>📋 Scan Data</Text>
                 <View style={styles.infoBox}>
                   {staffScanData.type === 'STUDENT_ACTIVITY' ? (
                     <>
-                      <InfoRow label="👤 นักเรียน" value={staffScanData.studentName} />
-                      <InfoRow label="🏫 คณะ" value={`${staffScanData.facultyName} (${staffScanData.facultyCode})`} />
-                      <InfoRow label="🎮 กิจกรรม" value={staffScanData.activityTitle} />
-                      <InfoRow label="📍 สถานที่" value={staffScanData.room} />
-                      <InfoRow label="✨ รางวัล" value={`+${staffScanData.xp} XP & Stamp`} highlight />
+                      <InfoRow label="👤 Student" value={staffScanData.studentName} />
+                      <InfoRow label="🏫 Faculty" value={`${staffScanData.facultyName} (${staffScanData.facultyCode})`} />
+                      <InfoRow label="🎮 Activity" value={staffScanData.activityTitle} />
+                      <InfoRow label="📍 Location" value={staffScanData.room} />
+                      <InfoRow label="✨ Reward" value={`+${staffScanData.xp} XP & Stamp`} highlight />
                     </>
                   ) : (
                     <>
-                      <InfoRow label="🎁 ของรางวัล" value={staffScanData.rewardTitle} />
+                      <InfoRow label="🎁 Reward Item" value={staffScanData.rewardTitle} />
                       <InfoRow label="🔑 Token" value={staffScanData.token} highlight />
-                      <InfoRow label="สถานะ" value={staffScanData.status === 'redeemed' ? '🟢 รับแล้ว' : '🟡 รอมอบของ'} />
+                      <InfoRow label="Status" value={staffScanData.status === 'redeemed' ? '🟢 Redeemed' : '🟡 Pending'} />
                     </>
                   )}
                 </View>
                 <TouchableOpacity style={styles.confirmStaffBtn} onPress={handleStaffConfirm}>
-                  <Text style={styles.confirmStaffBtnText}>🟢 ยืนยันให้สิทธิ์ทันที</Text>
+                  <Text style={styles.confirmStaffBtnText}>🟢 Confirm Instantly</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cancelBtn} onPress={() => setStaffScanData(null)}>
-                  <Text style={styles.cancelBtnText}>ยกเลิก</Text>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
                 </TouchableOpacity>
               </View>
 
@@ -234,7 +234,7 @@ export default function QRScannerModal({ visible, onClose }) {
                       onPress={() => setUseCamera(false)}
                     >
                       <Text style={[styles.modeToggleText, !useCamera && styles.modeToggleTextActive]}>
-                        🎯 ทดสอบ (ไม่ใช้กล้อง)
+                        🎯 Test (No Camera)
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
@@ -246,7 +246,7 @@ export default function QRScannerModal({ visible, onClose }) {
                       }}
                     >
                       <Text style={[styles.modeToggleText, useCamera && styles.modeToggleTextActive]}>
-                        📷 ใช้กล้องสแกน
+                        📷 Use Camera
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -266,10 +266,10 @@ export default function QRScannerModal({ visible, onClose }) {
                     {/* Corner brackets */}
                     <View style={[styles.corner, styles.cTL]} /><View style={[styles.corner, styles.cTR]} />
                     <View style={[styles.corner, styles.cBL]} /><View style={[styles.corner, styles.cBR]} />
-                    <Text style={styles.cameraHint}>ส่อง QR Code จากซุ้มของ Staff</Text>
+                    <Text style={styles.cameraHint}>Scan QR Code from Staff Booth</Text>
                     {scanned && !successMessage && !errorMessage && (
                       <TouchableOpacity style={styles.rescanBtn} onPress={() => setScanned(false)}>
-                        <Text style={styles.rescanBtnText}>🔄 สแกนใหม่</Text>
+                        <Text style={styles.rescanBtnText}>🔄 Scan Again</Text>
                       </TouchableOpacity>
                     )}
                     {errorMessage && (
@@ -280,9 +280,9 @@ export default function QRScannerModal({ visible, onClose }) {
                   </View>
                 ) : useCamera && !permission?.granted ? (
                   <View style={styles.permissionBox}>
-                    <Text style={styles.permissionText}>ต้องการสิทธิ์การใช้กล้อง</Text>
+                    <Text style={styles.permissionText}>Camera permission required</Text>
                     <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
-                      <Text style={styles.permissionBtnText}>อนุญาตให้ใช้กล้อง</Text>
+                      <Text style={styles.permissionBtnText}>Allow Camera Access</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -292,8 +292,8 @@ export default function QRScannerModal({ visible, onClose }) {
                     <View style={[styles.corner, styles.cBL]} /><View style={[styles.corner, styles.cBR]} />
                     <Text style={styles.viewfinderText}>
                       {userProfile.role === 'staff'
-                        ? '📱 สแกน QR Token ของน้อง หรือ QR แลกของรางวัล'
-                        : '📷 กด "ใช้กล้องสแกน" หรือทดสอบด้านล่าง'}
+                        ? '📱 Scan Student Token or Reward QR'
+                        : '📷 Tap "Use Camera" or test below'}
                     </Text>
                   </View>
                 )}
@@ -301,7 +301,7 @@ export default function QRScannerModal({ visible, onClose }) {
                 {/* Demo / test buttons */}
                 {userProfile.role === 'staff' ? (
                   <View style={styles.demoSection}>
-                    <Text style={styles.demoHeader}>👔 ทดสอบ: สแกนน้องประจำคณะ</Text>
+                    <Text style={styles.demoHeader}>👔 Test: Scan Visitor</Text>
                     {FACULTIES.slice(0, 4).map((fac) => (
                       <TouchableOpacity
                         key={fac.id}
@@ -315,7 +315,7 @@ export default function QRScannerModal({ visible, onClose }) {
                     ))}
                     {redeemedRewards.length > 0 && (
                       <View style={{ marginTop: 14 }}>
-                        <Text style={styles.demoHeader}>🎁 สแกน QR แลกของรางวัล</Text>
+                        <Text style={styles.demoHeader}>🎁 Scan Reward QR</Text>
                         {redeemedRewards.map((r, idx) => (
                           <TouchableOpacity
                             key={idx}
@@ -333,7 +333,7 @@ export default function QRScannerModal({ visible, onClose }) {
                 ) : (
                   !useCamera && (
                     <View style={styles.demoSection}>
-                      <Text style={styles.demoHeader}>⚡ ทดสอบสแกน QR ประจำซุ้ม (ไม่ใช้กล้อง)</Text>
+                      <Text style={styles.demoHeader}>⚡ Test Faculty QR Scan (No Camera)</Text>
                       <View style={styles.quickGrid}>
                         {FACULTIES.slice(0, 6).map((fac) => (
                           <TouchableOpacity

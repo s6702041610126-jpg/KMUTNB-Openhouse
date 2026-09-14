@@ -222,12 +222,12 @@ export default function InAppMapView({ onSelectFaculty }) {
               <div style="text-align:center; padding: 6px; min-width: 170px;">
                 <div style="font-weight:800; font-size:15px; color:#1E293B;">\${fac.name}</div>
                 <div style="font-size:12px; color:#64748B; margin-top:3px;">📍 \${fac.building}</div>
-                <div style="font-size:11px; color:#10B981; font-weight:700; margin-top:6px;">🎯 \${fac.activities.length} กิจกรรมสะสม XP</div>
+                <div style="font-size:11px; color:#10B981; font-weight:700; margin-top:6px;">🎯 \${fac.activities.length} XP Activities</div>
                 <button class="popup-btn-nav" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({type:'START_NAV_DIRECT', facultyId:'\${fac.id}'}))">
-                  🧭 นำทางไปคณะนี้ทันที 🚶
+                  🧭 Navigate Here 🚶
                 </button>
                 <button class="popup-btn-detail" onclick="window.ReactNativeWebView.postMessage(JSON.stringify({type:'SELECT_FACULTY', facultyId:'\${fac.id}'}))">
-                  ℹ️ ดูรายละเอียดคณะ
+                  ℹ️ View Details
                 </button>
               </div>
             \`;
@@ -243,7 +243,7 @@ export default function InAppMapView({ onSelectFaculty }) {
               <div class="avatar-pin-container">
                 <div class="avatar-heading-arrow" style="transform: rotate(\${headingDeg}deg)"></div>
                 <div class="avatar-pin">\${avatarIcon || '🤖'}</div>
-                <div class="user-badge">ตำแหน่งของฉัน (GPS)</div>
+                <div class="user-badge">My Location (GPS)</div>
               </div>
             \`;
 
@@ -289,7 +289,7 @@ export default function InAppMapView({ onSelectFaculty }) {
 
           var routeLoadingEl = document.createElement('div');
           routeLoadingEl.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(30,41,59,0.9);color:#fff;font-size:13px;font-weight:700;padding:10px 22px;border-radius:20px;display:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.35);';
-          routeLoadingEl.innerHTML = '🗺️ คำนวณเส้นทาง…';
+          routeLoadingEl.innerHTML = '🗺️ Calculating route…';
           document.body.appendChild(routeLoadingEl);
 
           function clearRoute() {
@@ -346,17 +346,17 @@ export default function InAppMapView({ onSelectFaculty }) {
 
           function getStepVerb(m) {
             var mod = m.modifier || '';
-            if (m.type === 'depart')  return '🚶 เริ่มเดินตรงไป';
-            if (m.type === 'arrive')  return '🏁 ถึงจุดหมาย!';
-            if (mod === 'left')       return '↰ เลี้ยวซ้าย';
-            if (mod === 'sharp left') return '↰ เลี้ยวซ้ายคม';
-            if (mod === 'slight left')return '↰ เฉียงซ้ายเล็กน้อย';
-            if (mod === 'right')      return '↱ เลี้ยวขวา';
-            if (mod === 'sharp right')return '↱ เลี้ยวขวาคม';
-            if (mod === 'slight right')return '↱ เฉียงขวาเล็กน้อย';
-            if (mod === 'uturn')      return '↩️ กลับรถ';
-            if (m.type === 'roundabout') return '🔄 เข้าวงเวียน';
-            return '⬆️ เดินตรงไป';
+            if (m.type === 'depart')  return '🚶 Start walking straight';
+            if (m.type === 'arrive')  return '🏁 Arrived!';
+            if (mod === 'left')       return '↰ Turn left';
+            if (mod === 'sharp left') return '↰ Sharp left';
+            if (mod === 'slight left')return '↰ Slight left';
+            if (mod === 'right')      return '↱ Turn right';
+            if (mod === 'sharp right')return '↱ Sharp right';
+            if (mod === 'slight right')return '↱ Slight right';
+            if (mod === 'uturn')      return '↩️ U-Turn';
+            if (m.type === 'roundabout') return '🔄 Enter roundabout';
+            return '⬆️ Walk straight';
           }
 
           function fetchRoute(uLat, uLng, tLat, tLng, shouldFit) {
@@ -564,7 +564,7 @@ export default function InAppMapView({ onSelectFaculty }) {
           onPress={() => handleSwitchTileMode('google_vector')}
         >
           <Text style={[styles.modeTabText, tileMode === 'google_vector' && styles.modeTabTextActive]}>
-            🗺️ Google ถนน
+            🗺️ Google Street
           </Text>
         </TouchableOpacity>
 
@@ -573,7 +573,7 @@ export default function InAppMapView({ onSelectFaculty }) {
           onPress={() => handleSwitchTileMode('google_satellite')}
         >
           <Text style={[styles.modeTabText, tileMode === 'google_satellite' && styles.modeTabTextActive]}>
-            🛰️ Google ดาวเทียม
+            🛰️ Google Satellite
           </Text>
         </TouchableOpacity>
 
@@ -582,7 +582,7 @@ export default function InAppMapView({ onSelectFaculty }) {
           onPress={() => setTileMode('google_embed')}
         >
           <Text style={[styles.modeTabText, tileMode === 'google_embed' && styles.modeTabTextActive]}>
-            📍 Google ฝังตรง
+            📍 Google Embed
           </Text>
         </TouchableOpacity>
       </View>
@@ -605,7 +605,7 @@ export default function InAppMapView({ onSelectFaculty }) {
             renderLoading={() => (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#F15A24" />
-                <Text style={styles.loadingText}>กำลังโหลดแผนที่ Google Maps HD KMUTNB...</Text>
+                <Text style={styles.loadingText}>Loading KMUTNB HD Map...</Text>
               </View>
             )}
           />
@@ -618,7 +618,7 @@ export default function InAppMapView({ onSelectFaculty }) {
               activeOpacity={0.8}
             >
               <Text style={[styles.locationPillText, locationMode === 'auto' && styles.locationPillTextActive]}>
-                📡 GPS สดมือถือ
+                📡 Live GPS
               </Text>
             </TouchableOpacity>
 
@@ -628,13 +628,13 @@ export default function InAppMapView({ onSelectFaculty }) {
               activeOpacity={0.8}
             >
               <Text style={[styles.locationPillText, locationMode === 'campus' && styles.locationPillTextActive]}>
-                🏫 ประตูหน้า มจพ.
+                🏫 Front Gate
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.recenterBtn} onPress={centerOnUser} activeOpacity={0.8}>
               <Text style={styles.recenterIcon}>{selectedAvatar.icon}</Text>
-              <Text style={styles.recenterText}>โฟกัสพิกัดฉัน</Text>
+              <Text style={styles.recenterText}>Recenter</Text>
             </TouchableOpacity>
           </View>
         </View>

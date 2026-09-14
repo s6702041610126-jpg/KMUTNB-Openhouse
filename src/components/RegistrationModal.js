@@ -33,34 +33,34 @@ export default function RegistrationModal({ visible, onClose }) {
               <Text style={styles.headerIcon}>🎓</Text>
               <Text style={styles.headerTitle}>KMUTNB OPEN HOUSE 2026</Text>
               <Text style={styles.headerSubtitle}>
-                กรอกข้อมูลผู้เข้าชมงานและเลือกตัวละครออกเดินทาง!
+                Fill in your info and choose your avatar to begin!
               </Text>
             </View>
 
             {/* Input Form */}
             <View style={styles.card}>
-              <Text style={styles.label}>👤 ชื่อ-นามสกุล / ชื่อเล่น</Text>
+              <Text style={styles.label}>👤 Name / Nickname</Text>
               <TextInput
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
-                placeholder="เช่น ธันย์พิชชา (Thanpitcha)"
+                placeholder="e.g. Thanpitcha"
                 placeholderTextColor="#94A3B8"
               />
 
-              <Text style={[styles.label, { marginTop: 14 }]}>🏫 โรงเรียน / สถาบันการศึกษา</Text>
+              <Text style={[styles.label, { marginTop: 14 }]}>🏫 School / Institution</Text>
               <TextInput
                 style={styles.input}
                 value={school}
                 onChangeText={setSchool}
-                placeholder="เช่น โรงเรียนสาธิต มจพ. / ชั้น ม.6"
+                placeholder="e.g. KMUTNB Demonstration School"
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             {/* Avatar Selector */}
-            <Text style={styles.sectionHeader}>🤖 เลือกตัวละครประจำตัว (Avatar)</Text>
-            <Text style={styles.sectionSub}>ตัวละครนี้จะเดินตาม GPS ของคุณบนแผนที่จริง!</Text>
+            <Text style={styles.sectionHeader}>🤖 Choose Your Avatar</Text>
+            <Text style={styles.sectionSub}>This avatar will follow your GPS on the live map!</Text>
 
             <View style={styles.avatarGrid}>
               {AVATARS.map((item) => {
@@ -91,7 +91,7 @@ export default function RegistrationModal({ visible, onClose }) {
           {/* Submit Action */}
           <View style={styles.footer}>
             <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} activeOpacity={0.85}>
-              <Text style={styles.submitBtnText}>🚀 เริ่มต้นออกเดินทาง!</Text>
+              <Text style={styles.submitBtnText}>🚀 Start Exploring!</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

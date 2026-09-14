@@ -17,7 +17,6 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
     startNavigation,
     completedActivities,
     visitedFaculties,
-    setIsSimulatingWalk,
   } = useApp();
 
   if (!faculty) return null;
@@ -34,7 +33,6 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
 
   const handleStartNav = (activity = null) => {
     startNavigation(faculty, activity);
-    setIsSimulatingWalk(true);
     onClose();
   };
 
@@ -49,7 +47,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
               <View style={{ flex: 1, marginLeft: 10 }}>
                 <Text style={styles.facultyCode}>{faculty.code}</Text>
                 <Text style={styles.facultyName} numberOfLines={1}>
-                  {faculty.name}
+                  {faculty.nameEn}
                 </Text>
               </View>
               <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
@@ -60,18 +58,18 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
             {/* Quick Metrics Bar */}
             <View style={styles.metricsRow}>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>📍 อาคาร</Text>
+                <Text style={styles.metricLabel}>📍 Building</Text>
                 <Text style={styles.metricValue}>{faculty.building}</Text>
               </View>
               <View style={styles.metricDivider} />
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>🚶 ระยะทาง</Text>
-                <Text style={styles.metricValue}>{distanceMeters} ม.</Text>
+                <Text style={styles.metricLabel}>🚶 Distance</Text>
+                <Text style={styles.metricValue}>{distanceMeters} m</Text>
               </View>
               <View style={styles.metricDivider} />
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>⏱️ เวลาเดิน</Text>
-                <Text style={styles.metricValue}>{walkingMinutes} นาที</Text>
+                <Text style={styles.metricLabel}>⏱️ Walk Time</Text>
+                <Text style={styles.metricValue}>{walkingMinutes} min</Text>
               </View>
             </View>
           </View>
@@ -79,7 +77,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
           <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {/* Embedded Official Map Preview */}
             <View style={styles.mapCard}>
-              <Text style={styles.sectionTitle}>📍 แผนที่อาคารคณะ (Google Maps In-App)</Text>
+              <Text style={styles.sectionTitle}>📍 Faculty Building Map</Text>
               <View style={styles.webviewWrapper}>
                 <WebView
                   originWhitelist={['*']}
@@ -91,10 +89,10 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
 
             {/* Faculty Description */}
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>ℹ️ เกี่ยวกับคณะ</Text>
+              <Text style={styles.sectionTitle}>ℹ️ About This Faculty</Text>
               <Text style={styles.descriptionText}>{faculty.description}</Text>
 
-              <Text style={[styles.sectionTitle, { marginTop: 14 }]}>🎯 จุดเด่น & ไฮไลท์</Text>
+              <Text style={[styles.sectionTitle, { marginTop: 14 }]}>🎯 Highlights</Text>
               <View style={styles.tagContainer}>
                 {faculty.highlights.map((item, idx) => (
                   <View key={idx} style={[styles.tagPill, { backgroundColor: faculty.color + '20' }]}>
@@ -103,7 +101,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
                 ))}
               </View>
 
-              <Text style={[styles.sectionTitle, { marginTop: 14 }]}>👥 เส้นทางอาชีพในอนาคต</Text>
+              <Text style={[styles.sectionTitle, { marginTop: 14 }]}>👥 Career Paths</Text>
               <View style={styles.tagContainer}>
                 {faculty.careers.map((career, idx) => (
                   <View key={idx} style={styles.careerPill}>
@@ -116,10 +114,10 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
             {/* Activities List */}
             <View style={styles.card}>
               <View style={styles.cardHeaderRow}>
-                <Text style={styles.sectionTitle}>🎮 กิจกรรมสะสม XP ({faculty.activities.length})</Text>
+                <Text style={styles.sectionTitle}>🎮 XP Activities ({faculty.activities.length})</Text>
                 {isVisited && (
                   <View style={styles.visitedBadge}>
-                    <Text style={styles.visitedBadgeText}>✓ ได้ Stamp แล้ว</Text>
+                    <Text style={styles.visitedBadgeText}>✓ Stamp Collected</Text>
                   </View>
                 )}
               </View>
@@ -145,7 +143,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
 
                     {isDone ? (
                       <View style={styles.doneTag}>
-                        <Text style={styles.doneTagText}>สำเร็จแล้ว ✓</Text>
+                        <Text style={styles.doneTagText}>Done ✓</Text>
                       </View>
                     ) : (
                       <TouchableOpacity
@@ -153,7 +151,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
                         onPress={() => handleStartNav(act)}
                         activeOpacity={0.8}
                       >
-                        <Text style={styles.navActBtnText}>เริ่มนำทาง 🚶</Text>
+                        <Text style={styles.navActBtnText}>Navigate 🚶</Text>
                       </TouchableOpacity>
                     )}
                   </View>
@@ -171,7 +169,7 @@ export default function FacultyDetailModal({ faculty, visible, onClose }) {
               onPress={() => handleStartNav(null)}
               activeOpacity={0.85}
             >
-              <Text style={styles.mainNavBtnText}>🧭 เริ่มนำทางไปยัง {faculty.code}</Text>
+              <Text style={styles.mainNavBtnText}>🧭 Navigate to {faculty.code}</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

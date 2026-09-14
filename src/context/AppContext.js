@@ -28,19 +28,19 @@ export function generateTurnByTurnSteps(userLat, userLng, faculty, activity = nu
   const steps = [
     {
       icon: '🚶',
-      instruction: `เริ่มต้นเดินทางไปยัง ${faculty.name}`,
+      instruction: `Start navigating to ${faculty.name}`,
       distance: Math.round(dist * 0.4),
     },
     {
       icon: '↗️',
-      instruction: `มุ่งหน้าเข้าสู่ ${faculty.building}`,
+      instruction: `Heading into ${faculty.building}`,
       distance: Math.round(dist * 0.4),
     },
     {
       icon: activity ? '🚪' : '🏁',
       instruction: activity
-        ? `เข้าสู่ ${activity.room} เพื่อร่วม "${activity.title}"`
-        : `ถึง ${faculty.name} แล้ว!`,
+        ? `Enter ${activity.room} to join "${activity.title}"`
+        : `Arrived at ${faculty.name}!`,
       distance: Math.round(dist * 0.2),
     },
   ];
@@ -349,11 +349,11 @@ export const AppProvider = ({ children }) => {
 
   const redeemReward = (rewardId) => {
     const reward = REWARDS.find((r) => r.id === rewardId);
-    if (!reward) return { success: false, message: 'ไม่พบของรางวัล' };
+    if (!reward) return { success: false, message: 'Reward not found' };
     if (earnedXP < reward.costXP)
-      return { success: false, message: `คุณมี XP ไม่พอ (ต้องการ ${reward.costXP} XP)` };
+      return { success: false, message: `Not enough XP (need ${reward.costXP} XP)` };
     if (reward.requiredFaculties > visitedFaculties.length)
-      return { success: false, message: `ต้องสะสมตราประทับครบ ${reward.requiredFaculties} คณะก่อน` };
+      return { success: false, message: `Need stamps from ${reward.requiredFaculties} faculties first` };
 
     const token = 'KMUTNB-' + Math.random().toString(36).substring(2, 9).toUpperCase();
     setRedeemedRewards((prev) => [
@@ -367,21 +367,21 @@ export const AppProvider = ({ children }) => {
       },
     ]);
     setEarnedXP((prev) => prev - reward.costXP);
-    return { success: true, token, message: 'สร้าง QR แลกของรางวัลสำเร็จ!' };
+    return { success: true, token, message: 'Reward QR generated successfully!' };
   };
 
   const confirmStaffAction = (scanData) => {
     if (scanData.type === 'STUDENT_ACTIVITY') {
       checkInActivity(scanData.facultyId, scanData.activityId, scanData.xp || 10);
-      return { success: true, message: `อนุมัติสำเร็จ! บันทึกกิจกรรม ${scanData.activityTitle} เรียบร้อยแล้ว` };
+      return { success: true, message: `Approved! Activity ${scanData.activityTitle} recorded` };
     }
     if (scanData.type === 'REWARD_TOKEN') {
       setRedeemedRewards((prev) =>
         prev.map((r) => (r.token === scanData.token ? { ...r, status: 'redeemed' } : r))
       );
-      return { success: true, message: `ยืนยันการมอบของรางวัล "${scanData.rewardTitle}" เรียบร้อยแล้ว` };
+      return { success: true, message: `Confirmed delivery of reward "${scanData.rewardTitle}"` };
     }
-    return { success: false, message: 'ข้อมูล QR Code ไม่ถูกต้อง' };
+    return { success: false, message: 'Invalid QR Code data' };
   };
 
   const selectedAvatar = AVATARS.find((a) => a.id === userProfile.avatarId) || AVATARS[0];

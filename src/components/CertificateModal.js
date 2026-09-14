@@ -17,7 +17,7 @@ export default function CertificateModal({ visible, onClose }) {
   const isEligible = completedActivities.length >= 3;
 
   const handleDownload = () => {
-    Alert.alert('🎉 สำเร็จ!', 'ดาวน์โหลดเกียรติบัตร KMUTNB Open House (PDF) เรียบร้อยแล้ว!');
+    Alert.alert('🎉 Success!', 'KMUTNB Open House certificate (PDF) downloaded successfully!');
   };
 
   return (
@@ -25,7 +25,7 @@ export default function CertificateModal({ visible, onClose }) {
       <View style={styles.overlay}>
         <SafeAreaView style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>📜 เกียรติบัตรเข้าร่วมกิจกรรม</Text>
+            <Text style={styles.headerTitle}>📜 Participation Certificate</Text>
             <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Text style={styles.closeBtnText}>✕</Text>
             </TouchableOpacity>
@@ -38,14 +38,14 @@ export default function CertificateModal({ visible, onClose }) {
                 <View style={styles.innerBorder}>
                   <Text style={styles.kmutnbLogo}>🎓</Text>
                   <Text style={styles.certTitle}>CERTIFICATE OF PARTICIPATION</Text>
-                  <Text style={styles.certSubTitle}>เกียรติบัตรฉบับนี้ให้ไว้เพื่อแสดงว่า</Text>
+                  <Text style={styles.certSubTitle}>This certificate is awarded to</Text>
 
                   <Text style={styles.userName}>{userProfile.name}</Text>
                   <Text style={styles.userSchool}>{userProfile.school}</Text>
 
                   <Text style={styles.certDescription}>
-                    ได้เข้าร่วมกิจกรรมและพิชิตภารกิจในงาน KMUTNB OPEN HOUSE 2026{'\n'}
-                    สะสมกิจกรรมรวม {completedActivities.length} กิจกรรม | {visitedFaculties.length} คณะ ({earnedXP} XP)
+                    Has participated in activities and completed missions at KMUTNB OPEN HOUSE 2026{'\n'}
+                    Completed {completedActivities.length} activities | {visitedFaculties.length} faculties ({earnedXP} XP)
                   </Text>
 
                   {/* Stamp Badge */}
@@ -57,11 +57,11 @@ export default function CertificateModal({ visible, onClose }) {
                   <View style={styles.issueRow}>
                     <View style={styles.issueCol}>
                       <Text style={styles.signLine}>___________________</Text>
-                      <Text style={styles.signTitle}>ประธานจัดงาน Open House</Text>
+                      <Text style={styles.signTitle}>Open House Committee Chair</Text>
                     </View>
                     <View style={styles.issueCol}>
                       <Text style={styles.signLine}>___________________</Text>
-                      <Text style={styles.signTitle}>คณบดี/ผู้อำนวยการ</Text>
+                      <Text style={styles.signTitle}>Dean / Director</Text>
                     </View>
                   </View>
                 </View>
@@ -69,10 +69,10 @@ export default function CertificateModal({ visible, onClose }) {
             ) : (
               <View style={styles.lockedCard}>
                 <Text style={styles.lockedIcon}>🔒</Text>
-                <Text style={styles.lockedTitle}>ยังไม่ผ่านเงื่อนไขรับเกียรติบัตร</Text>
+                <Text style={styles.lockedTitle}>Certificate requirements not met</Text>
                 <Text style={styles.lockedSub}>
-                  ต้องเข้าร่วมกิจกรรมอย่างน้อย 3 กิจกรรม{'\n'}
-                  (ปัจจุบันทำได้ {completedActivities.length}/3 กิจกรรม)
+                  Complete at least 3 activities{'\n'}
+                  (Current progress: {completedActivities.length}/3 activities)
                 </Text>
               </View>
             )}
@@ -81,7 +81,7 @@ export default function CertificateModal({ visible, onClose }) {
           {isEligible && (
             <View style={styles.footer}>
               <TouchableOpacity style={styles.downloadBtn} onPress={handleDownload} activeOpacity={0.85}>
-                <Text style={styles.downloadBtnText}>📥 ดาวน์โหลด PDF เกียรติบัตร</Text>
+                <Text style={styles.downloadBtnText}>📥 Download Certificate PDF</Text>
               </TouchableOpacity>
             </View>
           )}

@@ -42,7 +42,7 @@ export default function MapScreen() {
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.headerTitle}>KMUTNB Live Navigator</Text>
             <Text style={styles.headerSub}>
-              สะสมตราประทับ: <Text style={styles.boldText}>{visitedFaculties.length}/9 คณะ</Text>
+              Stamps collected: <Text style={styles.boldText}>{visitedFaculties.length}/9 Faculties</Text>
             </Text>
           </View>
 
@@ -53,7 +53,7 @@ export default function MapScreen() {
             activeOpacity={0.8}
           >
             <Text style={styles.scanBtnIcon}>📷</Text>
-            <Text style={styles.scanBtnText}>สแกน QR</Text>
+            <Text style={styles.scanBtnText}>Scan QR</Text>
           </TouchableOpacity>
         </View>
 
@@ -64,7 +64,7 @@ export default function MapScreen() {
             onPress={() => setActiveFilter('ALL')}
           >
             <Text style={[styles.filterText, activeFilter === 'ALL' && styles.filterTextActive]}>
-              ทั้งหมด ({FACULTIES.length})
+              All ({FACULTIES.length})
             </Text>
           </TouchableOpacity>
 
@@ -73,7 +73,7 @@ export default function MapScreen() {
             onPress={() => setActiveFilter('VISITED')}
           >
             <Text style={[styles.filterText, activeFilter === 'VISITED' && styles.filterTextActive]}>
-              ✓ ไปแล้ว ({visitedFaculties.length})
+              ✓ Visited ({visitedFaculties.length})
             </Text>
           </TouchableOpacity>
 
@@ -82,7 +82,7 @@ export default function MapScreen() {
             onPress={() => setActiveFilter('LOCKED')}
           >
             <Text style={[styles.filterText, activeFilter === 'LOCKED' && styles.filterTextActive]}>
-              🔒 ยังไม่ได้ไป ({FACULTIES.length - visitedFaculties.length})
+              🔒 Not Visited ({FACULTIES.length - visitedFaculties.length})
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -125,7 +125,7 @@ export default function MapScreen() {
                     <View>
                       <Text style={styles.chipCode}>{fac.code}</Text>
                       <Text style={styles.chipName} numberOfLines={1}>
-                        {fac.name}
+                        {fac.nameEn}
                       </Text>
                     </View>
                   </TouchableOpacity>

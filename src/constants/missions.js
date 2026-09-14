@@ -2,7 +2,7 @@ export const MISSIONS = [
   {
     id: 'mission-first-step',
     title: 'Mission 01 — First Step 🧭',
-    description: 'เข้าร่วมกิจกรรมแรกใน KMUTNB Open House',
+    description: 'Join your first activity at KMUTNB Open House',
     requirementType: 'activities',
     targetCount: 1,
     rewardType: 'badge',
@@ -13,7 +13,7 @@ export const MISSIONS = [
   {
     id: 'mission-activity-hunter',
     title: 'Mission 02 — Activity Hunter 🎯',
-    description: 'เข้าร่วมกิจกรรมสะสมครบ 5 กิจกรรม',
+    description: 'Collect a total of 5 activities',
     requirementType: 'activities',
     targetCount: 5,
     rewardType: 'reward_access',
@@ -24,7 +24,7 @@ export const MISSIONS = [
   {
     id: 'mission-faculty-explorer',
     title: 'Mission 03 — Faculty Explorer 🏫',
-    description: 'ออกเดินทางเยี่ยมชมครบ 3 คณะ',
+    description: 'Visit a total of 3 faculties',
     requirementType: 'faculties',
     targetCount: 3,
     rewardType: 'badge',
@@ -35,7 +35,7 @@ export const MISSIONS = [
   {
     id: 'mission-campus-collector',
     title: 'Mission 04 — Campus Collector 🗺️',
-    description: 'สะสม Faculty Stamp ครบ 5 คณะ',
+    description: 'Collect 5 Faculty Stamps',
     requirementType: 'faculties',
     targetCount: 5,
     rewardType: 'reward_access',
@@ -46,7 +46,7 @@ export const MISSIONS = [
   {
     id: 'mission-kmutnb-master',
     title: 'Mission 05 — KMUTNB Master Explorer 🏆',
-    description: 'ออกเดินทางพิชิตครบ 9/9 คณะทั่วทั้งมหาวิทยาลัย!',
+    description: 'Visit all 9/9 faculties across the university!',
     requirementType: 'faculties',
     targetCount: 9,
     rewardType: 'special',
@@ -64,7 +64,7 @@ export const REWARDS = [
     costXP: 50,
     requiredFaculties: 0,
     icon: '🎨',
-    description: 'ชุดสติ๊กเกอร์ไดคัทสุดน่ารัก ลายประจำคณะ มจพ.',
+    description: 'Cute die-cut sticker set of KMUTNB faculties',
     stock: 500,
   },
   {
@@ -74,7 +74,7 @@ export const REWARDS = [
     costXP: 100,
     requiredFaculties: 3,
     icon: '🏅',
-    description: 'เข็มกลัดที่ระลึกโลหะ พรีเมียม KMUTNB 2026',
+    description: 'Premium KMUTNB 2026 metal souvenir badge',
     stock: 250,
   },
   {
@@ -84,7 +84,7 @@ export const REWARDS = [
     costXP: 150,
     requiredFaculties: 5,
     icon: '🛍️',
-    description: 'กระเป๋าผ้าแคนวาสอย่างดี พิมพ์ลาย Gamified Campus',
+    description: 'High-quality canvas bag printed with Gamified Campus pattern',
     stock: 100,
   },
   {
@@ -94,7 +94,7 @@ export const REWARDS = [
     costXP: 200,
     requiredFaculties: 9,
     icon: '🎁',
-    description: 'กล่องของขวัญพิเศษสุดลิมิเต็ด สำหรับผู้สะสมตราประทับครบ 9/9 คณะ',
+    description: 'Special limited gift box for collecting 9/9 faculty stamps',
     stock: 50,
   },
 ];
