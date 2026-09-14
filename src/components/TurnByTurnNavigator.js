@@ -13,10 +13,9 @@ export default function TurnByTurnNavigator() {
     activeNavigator,
     clearNavigation,
     checkInActivity,
-    checkInFacultyStamp,
-    userLocation,
     startNavigation,
     setIsQRScannerOpen,
+    setTargetScanFacultyId,
   } = useApp();
 
   if (!activeNavigator) return null;
@@ -25,6 +24,9 @@ export default function TurnByTurnNavigator() {
     activeNavigator.steps[activeNavigator.currentStepIndex] || activeNavigator.steps[0];
 
   const handleArrivalCheckIn = () => {
+    // Restrict the scanner to only accept this faculty
+    setTargetScanFacultyId(activeNavigator.facultyId);
+    
     // Open QR Scanner to actually claim the mission/activity
     setIsQRScannerOpen(true);
     clearNavigation();

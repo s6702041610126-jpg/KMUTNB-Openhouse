@@ -68,8 +68,8 @@ export function generateTurnByTurnSteps(userLat, userLng, faculty, activity = nu
 export const AppProvider = ({ children }) => {
   // ── User Profile ──────────────────────────────────────────────────────────
   const [userProfile, setUserProfile] = useState({
-    name: 'KMUTNB Explorer',
-    school: 'KMUTNB Demonstration School',
+    name: '',
+    school: '',
     avatarId: 'gear-bot',
     isRegistered: false,
     role: 'student',
@@ -100,6 +100,7 @@ export const AppProvider = ({ children }) => {
   const [selectedFacultyModal, setSelectedFacultyModal] = useState(null);
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
+  const [targetScanFacultyId, setTargetScanFacultyId] = useState(null);
   const [pendingStaffScan, setPendingStaffScan] = useState(null);
   const [staffSession, setStaffSession] = useState(null); // { facultyId, facultyCode, facultyName, facultyColor, facultyBadge }
 
@@ -424,6 +425,8 @@ export const AppProvider = ({ children }) => {
         setIsQRScannerOpen,
         isCertificateOpen,
         setIsCertificateOpen,
+        targetScanFacultyId,
+        setTargetScanFacultyId,
         pendingStaffScan,
         setPendingStaffScan,
         staffSession,

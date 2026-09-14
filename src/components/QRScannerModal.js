@@ -16,6 +16,8 @@ export default function QRScannerModal({ visible, onClose }) {
     checkInFacultyStamp,
     confirmStaffAction,
     redeemedRewards,
+    targetScanFacultyId,
+    setTargetScanFacultyId,
   } = useApp();
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -23,14 +25,13 @@ export default function QRScannerModal({ visible, onClose }) {
   const [staffScanData, setStaffScanData] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [useCamera, setUseCamera] = useState(false);
 
   const scanLineAnim = useRef(new Animated.Value(0)).current;
   const successAnim = useRef(new Animated.Value(0)).current;
 
   // Animate the scan line
   useEffect(() => {
-    if (visible && useCamera) {
+    if (visible && permission?.granted) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(scanLineAnim, { toValue: 1, duration: 1800, useNativeDriver: true }),
@@ -38,7 +39,7 @@ export default function QRScannerModal({ visible, onClose }) {
         ])
       ).start();
     }
-  }, [visible, useCamera]);
+  }, [visible, permission?.granted]);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -47,7 +48,6 @@ export default function QRScannerModal({ visible, onClose }) {
       setStaffScanData(null);
       setSuccessMessage(null);
       setErrorMessage(null);
-      setUseCamera(false);
     }
   }, [visible]);
 
@@ -64,6 +64,7 @@ export default function QRScannerModal({ visible, onClose }) {
     setSuccessMessage(null);
     setErrorMessage(null);
     successAnim.setValue(0);
+    setTargetScanFacultyId(null); // Clear any navigation-enforced target
     onClose();
   };
 
@@ -89,6 +90,14 @@ export default function QRScannerModal({ visible, onClose }) {
     // Student mode: scan Faculty QR from Staff device
     const result = validateFacultyQR(data);
     if (result.valid) {
+      // Check if we are enforcing a specific faculty (via Navigation)
+      if (targetScanFacultyId && targetScanFacultyId !== result.facultyId) {
+        const expectedFac = FACULTIES.find((f) => f.id === targetScanFacultyId);
+        setErrorMessage(`Please scan the QR code for ${expectedFac?.nameEn || 'the correct faculty'}!`);
+        setTimeout(() => { setScanned(false); setErrorMessage(null); }, 3000);
+        return;
+      }
+
       const fac = FACULTIES.find((f) => f.id === result.facultyId);
       if (fac) {
         checkInFacultyStamp(fac.id);
@@ -112,36 +121,7 @@ export default function QRScannerModal({ visible, onClose }) {
     }
   };
 
-  // ── Simulate scan (for testing without camera) ────────────────────────────
-  const handleStudentSimScan = (faculty, activity) => {
-    checkInActivity(faculty.id, activity.id, activity.xp);
-    checkInFacultyStamp(faculty.id);
-    showSuccess({
-      icon: '🎉',
-      title: 'Check-in Successful!',
-      sub: `${faculty.name} — ${activity.title}`,
-      detail: `📍 ${activity.room}\n✨ +${activity.xp} XP & Stamp ✓`,
-      color: faculty.color,
-    });
-  };
 
-  const handleSelectForStaffScan = (type, payload) => {
-    if (type === 'STUDENT_ACTIVITY') {
-      setStaffScanData({
-        type: 'STUDENT_ACTIVITY',
-        studentName: userProfile.name,
-        facultyName: payload.faculty.name,
-        facultyCode: payload.faculty.code,
-        facultyId: payload.faculty.id,
-        activityTitle: payload.activity.title,
-        activityId: payload.activity.id,
-        room: payload.activity.room,
-        xp: payload.activity.xp,
-      });
-    } else if (type === 'REWARD_TOKEN') {
-      setStaffScanData({ type: 'REWARD_TOKEN', ...payload });
-    }
-  };
 
   const handleStaffConfirm = () => {
     if (!staffScanData) return;
@@ -223,37 +203,11 @@ export default function QRScannerModal({ visible, onClose }) {
               </View>
 
             ) : (
-              /* ── SCANNER / SELECTOR VIEW ── */
+              /* ── SCANNER VIEW ── */
               <View style={styles.scannerBody}>
 
-                {/* Camera toggle (Student only) */}
-                {userProfile.role !== 'staff' && (
-                  <View style={styles.modeToggleRow}>
-                    <TouchableOpacity
-                      style={[styles.modeToggleBtn, !useCamera && styles.modeToggleBtnActive]}
-                      onPress={() => setUseCamera(false)}
-                    >
-                      <Text style={[styles.modeToggleText, !useCamera && styles.modeToggleTextActive]}>
-                        🎯 Test (No Camera)
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.modeToggleBtn, useCamera && styles.modeToggleBtnActive]}
-                      onPress={async () => {
-                        if (!permission?.granted) await requestPermission();
-                        setUseCamera(true);
-                        setScanned(false);
-                      }}
-                    >
-                      <Text style={[styles.modeToggleText, useCamera && styles.modeToggleTextActive]}>
-                        📷 Use Camera
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
                 {/* Real Camera Viewfinder */}
-                {useCamera && permission?.granted ? (
+                {permission?.granted ? (
                   <View style={styles.cameraContainer}>
                     <CameraView
                       style={styles.camera}
@@ -266,7 +220,9 @@ export default function QRScannerModal({ visible, onClose }) {
                     {/* Corner brackets */}
                     <View style={[styles.corner, styles.cTL]} /><View style={[styles.corner, styles.cTR]} />
                     <View style={[styles.corner, styles.cBL]} /><View style={[styles.corner, styles.cBR]} />
-                    <Text style={styles.cameraHint}>Scan QR Code from Staff Booth</Text>
+                    <Text style={styles.cameraHint}>
+                      {userProfile.role === 'staff' ? 'Scan Student QR Code' : 'Scan QR Code from Staff Booth'}
+                    </Text>
                     {scanned && !successMessage && !errorMessage && (
                       <TouchableOpacity style={styles.rescanBtn} onPress={() => setScanned(false)}>
                         <Text style={styles.rescanBtnText}>🔄 Scan Again</Text>
@@ -278,76 +234,13 @@ export default function QRScannerModal({ visible, onClose }) {
                       </View>
                     )}
                   </View>
-                ) : useCamera && !permission?.granted ? (
+                ) : (
                   <View style={styles.permissionBox}>
                     <Text style={styles.permissionText}>Camera permission required</Text>
                     <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
                       <Text style={styles.permissionBtnText}>Allow Camera Access</Text>
                     </TouchableOpacity>
                   </View>
-                ) : (
-                  /* Decorative viewfinder placeholder */
-                  <View style={styles.viewfinder}>
-                    <View style={[styles.corner, styles.cTL]} /><View style={[styles.corner, styles.cTR]} />
-                    <View style={[styles.corner, styles.cBL]} /><View style={[styles.corner, styles.cBR]} />
-                    <Text style={styles.viewfinderText}>
-                      {userProfile.role === 'staff'
-                        ? '📱 Scan Student Token or Reward QR'
-                        : '📷 Tap "Use Camera" or test below'}
-                    </Text>
-                  </View>
-                )}
-
-                {/* Demo / test buttons */}
-                {userProfile.role === 'staff' ? (
-                  <View style={styles.demoSection}>
-                    <Text style={styles.demoHeader}>👔 Test: Scan Visitor</Text>
-                    {FACULTIES.slice(0, 4).map((fac) => (
-                      <TouchableOpacity
-                        key={fac.id}
-                        style={styles.staffDemoBtn}
-                        onPress={() => handleSelectForStaffScan('STUDENT_ACTIVITY', { faculty: fac, activity: fac.activities[0] })}
-                      >
-                        <Text style={styles.staffDemoText}>
-                          {fac.badgeIcon} {fac.code} — {fac.activities[0].title}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                    {redeemedRewards.length > 0 && (
-                      <View style={{ marginTop: 14 }}>
-                        <Text style={styles.demoHeader}>🎁 Scan Reward QR</Text>
-                        {redeemedRewards.map((r, idx) => (
-                          <TouchableOpacity
-                            key={idx}
-                            style={[styles.staffDemoBtn, { backgroundColor: '#F0FDF4' }]}
-                            onPress={() => handleSelectForStaffScan('REWARD_TOKEN', r)}
-                          >
-                            <Text style={[styles.staffDemoText, { color: '#166534' }]}>
-                              TOKEN: {r.token} ({r.rewardTitle})
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                ) : (
-                  !useCamera && (
-                    <View style={styles.demoSection}>
-                      <Text style={styles.demoHeader}>⚡ Test Faculty QR Scan (No Camera)</Text>
-                      <View style={styles.quickGrid}>
-                        {FACULTIES.slice(0, 6).map((fac) => (
-                          <TouchableOpacity
-                            key={fac.id}
-                            style={[styles.quickChip, { borderColor: fac.color }]}
-                            onPress={() => handleStudentSimScan(fac, fac.activities[0])}
-                          >
-                            <Text style={styles.quickChipIcon}>{fac.badgeIcon}</Text>
-                            <Text style={styles.quickChipText}>{fac.code}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-                  )
                 )}
               </View>
             )}
@@ -380,16 +273,6 @@ const styles = StyleSheet.create({
   closeBtnText: { fontSize: 18, color: '#64748B', fontWeight: 'bold' },
   content: { padding: 20 },
 
-  // ── Mode toggle ────────────────────────────────────────────────────────────
-  modeToggleRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  modeToggleBtn: {
-    flex: 1, paddingVertical: 10, borderRadius: 12,
-    backgroundColor: '#F1F5F9', alignItems: 'center',
-  },
-  modeToggleBtnActive: { backgroundColor: '#1E293B' },
-  modeToggleText: { fontSize: 12, fontWeight: '700', color: '#64748B' },
-  modeToggleTextActive: { color: '#FFFFFF' },
-
   // ── Camera ─────────────────────────────────────────────────────────────────
   cameraContainer: {
     width: '100%', height: 240, borderRadius: 20, overflow: 'hidden',
@@ -420,34 +303,13 @@ const styles = StyleSheet.create({
   permissionBtn: { backgroundColor: '#F15A24', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 14 },
   permissionBtnText: { color: '#FFFFFF', fontWeight: '800' },
 
-  // ── Viewfinder (placeholder) ───────────────────────────────────────────────
   scannerBody: { alignItems: 'center' },
-  viewfinder: {
-    width: 220, height: 220, backgroundColor: '#0F172A', borderRadius: 20,
-    justifyContent: 'center', alignItems: 'center', position: 'relative', padding: 20,
-  },
   corner: { position: 'absolute', width: 22, height: 22, borderColor: '#F15A24' },
   cTL: { top: 10, left: 10, borderTopWidth: 3, borderLeftWidth: 3 },
   cTR: { top: 10, right: 10, borderTopWidth: 3, borderRightWidth: 3 },
   cBL: { bottom: 10, left: 10, borderBottomWidth: 3, borderLeftWidth: 3 },
   cBR: { bottom: 10, right: 10, borderBottomWidth: 3, borderRightWidth: 3 },
-  viewfinderText: { color: '#94A3B8', fontSize: 12, textAlign: 'center', lineHeight: 18 },
 
-  // ── Demo section ───────────────────────────────────────────────────────────
-  demoSection: { width: '100%', marginTop: 20 },
-  demoHeader: { fontSize: 13, fontWeight: '700', color: '#334155', marginBottom: 10 },
-  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
-  quickChip: {
-    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8,
-    borderRadius: 12, borderWidth: 1.5, backgroundColor: '#F8FAFC',
-  },
-  quickChipIcon: { fontSize: 16, marginRight: 4 },
-  quickChipText: { fontSize: 12, fontWeight: '700', color: '#1E293B' },
-  staffDemoBtn: {
-    backgroundColor: '#FFF7ED', paddingHorizontal: 14, paddingVertical: 10,
-    borderRadius: 14, marginBottom: 8, borderWidth: 1, borderColor: '#FFEDD5',
-  },
-  staffDemoText: { fontSize: 12, fontWeight: '700', color: '#EA580C' },
 
   // ── Inspect/Confirm card ───────────────────────────────────────────────────
   inspectCard: { backgroundColor: '#F8FAFC', borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#E2E8F0' },

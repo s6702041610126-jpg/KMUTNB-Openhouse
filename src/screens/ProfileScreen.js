@@ -37,7 +37,7 @@ export default function ProfileScreen() {
 
           <Text style={styles.userName}>{userProfile.name}</Text>
           <Text style={styles.userSchool}>🏫 {userProfile.school}</Text>
-          <Text style={[styles.userQuote, { color: selectedAvatar.color }]}>"{selectedAvatar.quote}"</Text>
+
 
           <TouchableOpacity style={styles.editBtn} onPress={() => setIsEditModalOpen(true)}>
             <Text style={styles.editBtnText}>Edit Profile / Change Avatar</Text>
@@ -138,12 +138,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 4,
   },
-  userQuote: {
-    fontSize: 12,
-    fontWeight: '600',
-    fontStyle: 'italic',
-    marginTop: 6,
-  },
+
   editBtn: {
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 16,

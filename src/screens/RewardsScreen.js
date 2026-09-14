@@ -14,8 +14,6 @@ import { useApp } from '../context/AppContext';
 
 export default function RewardsScreen() {
   const { earnedXP, visitedFaculties, redeemedRewards, redeemReward } = useApp();
-  const [activeQRToken, setActiveQRToken] = useState(null);
-
   const handleRedeem = (reward) => {
     Alert.alert(
       'Confirm Redemption',
@@ -27,10 +25,7 @@ export default function RewardsScreen() {
           onPress: () => {
             const res = redeemReward(reward.id);
             if (res.success) {
-              setActiveQRToken({
-                title: reward.title,
-                token: res.token,
-              });
+              Alert.alert('🎉 Success!', `You have successfully redeemed "${reward.title}". Please claim your souvenir at the main booth.`);
             } else {
               Alert.alert('Unable to Redeem', res.message);
             }
@@ -95,54 +90,29 @@ export default function RewardsScreen() {
           );
         })}
 
-        {/* Redeemed Tokens Section */}
+        {/* Redeemed Items Section */}
         {redeemedRewards.length > 0 && (
           <View style={{ marginTop: 20 }}>
             <Text style={styles.sectionHeader}>🎫 Redeemed Rewards ({redeemedRewards.length})</Text>
             {redeemedRewards.map((r, idx) => (
-              <TouchableOpacity
+              <View
                 key={idx}
                 style={styles.redeemedItem}
-                onPress={() => setActiveQRToken({ title: r.rewardTitle, token: r.token })}
               >
                 <View style={{ flex: 1 }}>
                   <Text style={styles.redeemedTitle}>{r.rewardTitle}</Text>
-                  <Text style={styles.redeemedCode}>TOKEN: {r.token}</Text>
+                  <Text style={styles.redeemedCode}>Status: Claimed</Text>
                 </View>
-                <View style={styles.showQrBtn}>
-                  <Text style={styles.showQrBtnText}>Show QR 📱</Text>
+                <View style={styles.claimedBadge}>
+                  <Text style={styles.claimedBadgeText}>✓</Text>
                 </View>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
 
         <View style={{ height: 30 }} />
       </ScrollView>
-
-      {/* Redemption QR Modal */}
-      <Modal visible={!!activeQRToken} transparent animationType="fade" onRequestClose={() => setActiveQRToken(null)}>
-        <View style={styles.qrOverlay}>
-          <View style={styles.qrCard}>
-            <Text style={styles.qrHeaderTitle}>📱 Reward QR Code</Text>
-            <Text style={styles.qrRewardTitle}>{activeQRToken?.title}</Text>
-
-            {/* Simulated QR Code Graphic */}
-            <View style={styles.qrBox}>
-              <Text style={styles.qrBoxText}>[ QR CODE SEAL ]</Text>
-              <Text style={styles.qrTokenText}>{activeQRToken?.token}</Text>
-            </View>
-
-            <Text style={styles.qrInstruction}>
-              Present this QR code to staff at the main reward booth to claim your prize
-            </Text>
-
-            <TouchableOpacity style={styles.closeQrBtn} onPress={() => setActiveQRToken(null)}>
-              <Text style={styles.closeQrBtnText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -279,78 +249,17 @@ const styles = StyleSheet.create({
     color: '#15803D',
     marginTop: 2,
   },
-  showQrBtn: {
+  claimedBadge: {
     backgroundColor: '#10B981',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
-  },
-  showQrBtnText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: 'bold',
-  },
-  qrOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  qrCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 24,
-    alignItems: 'center',
-  },
-  qrHeaderTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#1E293B',
-  },
-  qrRewardTitle: {
-    fontSize: 14,
-    color: '#F15A24',
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  qrBox: {
-    width: 180,
-    height: 180,
-    backgroundColor: '#0F172A',
-    borderRadius: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 16,
-    padding: 16,
   },
-  qrBoxText: {
-    color: '#94A3B8',
-    fontSize: 12,
-  },
-  qrTokenText: {
-    color: '#10B981',
-    fontSize: 14,
-    fontWeight: '900',
-    marginTop: 10,
-    letterSpacing: 1,
-  },
-  qrInstruction: {
-    fontSize: 12,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 14,
-    lineHeight: 18,
-  },
-  closeQrBtn: {
-    backgroundColor: '#F15A24',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 14,
-    marginTop: 18,
-  },
-  closeQrBtnText: {
+  claimedBadgeText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });
