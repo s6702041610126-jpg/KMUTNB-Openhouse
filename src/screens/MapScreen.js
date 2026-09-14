@@ -33,60 +33,62 @@ export default function MapScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Banner Header */}
-      <View style={styles.topHeader}>
-        <View style={styles.avatarHeaderRow}>
-          <View style={styles.avatarCircle}>
-            <Text style={styles.avatarIconText}>{selectedAvatar.icon}</Text>
-          </View>
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Text style={styles.headerTitle}>KMUTNB Live Navigator</Text>
-            <Text style={styles.headerSub}>
-              Stamps collected: <Text style={styles.boldText}>{visitedFaculties.length}/9 Faculties</Text>
-            </Text>
+      {/* Top Banner Header - Hidden during active navigation to reduce clutter */}
+      {!activeNavigator && (
+        <View style={styles.topHeader}>
+          <View style={styles.avatarHeaderRow}>
+            <View style={styles.avatarCircle}>
+              <Text style={styles.avatarIconText}>{selectedAvatar.icon}</Text>
+            </View>
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={styles.headerTitle}>KMUTNB Live Navigator</Text>
+              <Text style={styles.headerSub}>
+                Stamps collected: <Text style={styles.boldText}>{visitedFaculties.length}/9 Faculties</Text>
+              </Text>
+            </View>
+
+            {/* Quick Scan QR Floating Button */}
+            <TouchableOpacity
+              style={styles.scanBtn}
+              onPress={() => setIsQRScannerOpen(true)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.scanBtnIcon}>📷</Text>
+              <Text style={styles.scanBtnText}>Scan QR</Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Quick Scan QR Floating Button */}
-          <TouchableOpacity
-            style={styles.scanBtn}
-            onPress={() => setIsQRScannerOpen(true)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.scanBtnIcon}>📷</Text>
-            <Text style={styles.scanBtnText}>Scan QR</Text>
-          </TouchableOpacity>
+          {/* Quick Filter Horizontal Scroll */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+            <TouchableOpacity
+              style={[styles.filterPill, activeFilter === 'ALL' && styles.filterPillActive]}
+              onPress={() => setActiveFilter('ALL')}
+            >
+              <Text style={[styles.filterText, activeFilter === 'ALL' && styles.filterTextActive]}>
+                All ({FACULTIES.length})
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.filterPill, activeFilter === 'VISITED' && styles.filterPillActive]}
+              onPress={() => setActiveFilter('VISITED')}
+            >
+              <Text style={[styles.filterText, activeFilter === 'VISITED' && styles.filterTextActive]}>
+                ✓ Visited ({visitedFaculties.length})
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.filterPill, activeFilter === 'LOCKED' && styles.filterPillActive]}
+              onPress={() => setActiveFilter('LOCKED')}
+            >
+              <Text style={[styles.filterText, activeFilter === 'LOCKED' && styles.filterTextActive]}>
+                🔒 Not Visited ({FACULTIES.length - visitedFaculties.length})
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
-
-        {/* Quick Filter Horizontal Scroll */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-          <TouchableOpacity
-            style={[styles.filterPill, activeFilter === 'ALL' && styles.filterPillActive]}
-            onPress={() => setActiveFilter('ALL')}
-          >
-            <Text style={[styles.filterText, activeFilter === 'ALL' && styles.filterTextActive]}>
-              All ({FACULTIES.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.filterPill, activeFilter === 'VISITED' && styles.filterPillActive]}
-            onPress={() => setActiveFilter('VISITED')}
-          >
-            <Text style={[styles.filterText, activeFilter === 'VISITED' && styles.filterTextActive]}>
-              ✓ Visited ({visitedFaculties.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.filterPill, activeFilter === 'LOCKED' && styles.filterPillActive]}
-            onPress={() => setActiveFilter('LOCKED')}
-          >
-            <Text style={[styles.filterText, activeFilter === 'LOCKED' && styles.filterTextActive]}>
-              🔒 Not Visited ({FACULTIES.length - visitedFaculties.length})
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+      )}
 
       {/* Main WebView Leaflet Map Engine */}
       <View style={styles.mapWrapper}>
@@ -96,54 +98,7 @@ export default function MapScreen() {
       {/* Turn-by-Turn Navigator Active Overlay */}
       {activeNavigator && <TurnByTurnNavigator />}
 
-      {/* Quick Select Faculty Carousel Bar at bottom of map */}
-      {!activeNavigator && (
-        <View style={styles.facultyBar}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.facultyScrollContent}
-          >
-            {filteredFaculties.map((fac) => {
-              const isVisited = visitedFaculties.includes(fac.id);
-              return (
-                <View
-                  key={fac.id}
-                  style={[
-                    styles.facultyChip,
-                    { borderColor: fac.color },
-                    isVisited && styles.facultyChipVisited,
-                  ]}
-                >
-                  {isVisited && <Text style={styles.chipCheck}>✓</Text>}
-                  <TouchableOpacity
-                    style={styles.chipMainArea}
-                    onPress={() => setSelectedFaculty(fac)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.chipIcon}>{fac.badgeIcon}</Text>
-                    <View>
-                      <Text style={styles.chipCode}>{fac.code}</Text>
-                      <Text style={styles.chipName} numberOfLines={1}>
-                        {fac.nameEn}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
 
-                  {/* Direct Start Navigation Button */}
-                  <TouchableOpacity
-                    style={[styles.quickNavBtn, { backgroundColor: fac.color }]}
-                    onPress={() => startNavigation(fac)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.quickNavBtnText}>🧭</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </ScrollView>
-        </View>
-      )}
 
       {/* Detail Modal */}
       <FacultyDetailModal

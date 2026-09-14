@@ -4,7 +4,6 @@ import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-na
 import { AppProvider, useApp } from './src/context/AppContext';
 import MapScreen from './src/screens/MapScreen';
 import MissionsScreen from './src/screens/MissionsScreen';
-import PassportScreen from './src/screens/PassportScreen';
 import RewardsScreen from './src/screens/RewardsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import StaffScreen from './src/screens/StaffScreen';
@@ -22,7 +21,7 @@ function MainApp() {
 
       {/* Top Header Bar */}
       <View style={styles.topNav}>
-        <Text style={styles.brandTitle}>KMUTNB OPEN HOUSE 2026</Text>
+        <Text style={styles.brandTitle}>KMUTNB OPEN HOUSE</Text>
         <View style={styles.topRightRow}>
           <View style={styles.roleChip}>
             <Text style={styles.roleChipText}>
@@ -39,7 +38,6 @@ function MainApp() {
       <View style={styles.screenContainer}>
         {activeTab === 'map'      && <MapScreen />}
         {activeTab === 'missions' && <MissionsScreen />}
-        {activeTab === 'passport' && <PassportScreen />}
         {activeTab === 'reward'   && <RewardsScreen />}
         {activeTab === 'profile'  && <ProfileScreen />}
         {activeTab === 'staff'    && <StaffScreen />}
@@ -67,23 +65,6 @@ function MainApp() {
             Missions
           </Text>
           {activeTab === 'missions' && <View style={styles.activeDot} />}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navTab}
-          onPress={() => setActiveTab('passport')}
-          activeOpacity={0.8}
-        >
-          <View style={{ position: 'relative' }}>
-            <Text style={[styles.navIcon, activeTab === 'passport' && styles.navIconActive]}>🎫</Text>
-            <View style={styles.badgeCount}>
-              <Text style={styles.badgeCountText}>{visitedFaculties.length}</Text>
-            </View>
-          </View>
-          <Text style={[styles.navLabel, activeTab === 'passport' && styles.navLabelActive]}>
-            Passport
-          </Text>
-          {activeTab === 'passport' && <View style={styles.activeDot} />}
         </TouchableOpacity>
 
         <TouchableOpacity

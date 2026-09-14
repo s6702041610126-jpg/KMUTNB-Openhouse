@@ -16,6 +16,7 @@ export default function TurnByTurnNavigator() {
     checkInFacultyStamp,
     userLocation,
     startNavigation,
+    setIsQRScannerOpen,
   } = useApp();
 
   if (!activeNavigator) return null;
@@ -24,53 +25,42 @@ export default function TurnByTurnNavigator() {
     activeNavigator.steps[activeNavigator.currentStepIndex] || activeNavigator.steps[0];
 
   const handleArrivalCheckIn = () => {
-    if (activeNavigator.activityId) {
-      checkInActivity(
-        activeNavigator.facultyId,
-        activeNavigator.activityId,
-        activeNavigator.activityXp || 10
-      );
-      Alert.alert(
-        '🎉 Congratulations!',
-        `You arrived at ${activeNavigator.activityRoom || activeNavigator.building} and checked in for "${activeNavigator.activityTitle}"! (+${activeNavigator.activityXp || 10} XP)`
-      );
-    } else {
-      checkInFacultyStamp(activeNavigator.facultyId);
-      Alert.alert('🎉 You have arrived!', `You arrived at ${activeNavigator.facultyName} and received a Stamp!`);
-    }
+    // Open QR Scanner to actually claim the mission/activity
+    setIsQRScannerOpen(true);
     clearNavigation();
   };
 
   return (
     <View style={styles.container} pointerEvents="box-none">
-      {/* Top Turn-by-Turn Guidance Banner — Google Maps Style */}
-      <View style={[styles.topBanner, { borderLeftColor: activeNavigator.color }]}>
-        <View style={styles.stepIconBox}>
-          <Text style={styles.stepIcon}>{currentStep.icon || '⬆️'}</Text>
-        </View>
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={styles.bannerTag}>NAVIGATOR • Step {activeNavigator.currentStepIndex + 1}/{activeNavigator.steps.length}</Text>
-            {currentStep.distance != null && (
-              <Text style={styles.stepDistanceBadge}>
-                {currentStep.distance < 1000
-                  ? `${currentStep.distance} m`
-                  : `${(currentStep.distance / 1000).toFixed(1)} km`}
+      {/* Consolidated Route Status Card */}
+      <View style={styles.bottomCard}>
+        {/* Current Navigation Step */}
+        <View style={styles.currentStepSection}>
+          <View style={[styles.stepIconBox, { backgroundColor: activeNavigator.color }]}>
+            <Text style={styles.stepIcon}>{currentStep.icon || '⬆️'}</Text>
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={[styles.bannerTag, { color: activeNavigator.color }]}>STEP {activeNavigator.currentStepIndex + 1}/{activeNavigator.steps.length}</Text>
+              {currentStep.distance != null && (
+                <Text style={[styles.stepDistanceBadge, { backgroundColor: activeNavigator.color }]}>
+                  {currentStep.distance < 1000
+                    ? `${currentStep.distance} m`
+                    : `${(currentStep.distance / 1000).toFixed(1)} km`}
+                </Text>
+              )}
+            </View>
+            <Text style={[styles.instructionText, { color: '#1E293B' }]}>{currentStep.instruction}</Text>
+            {/* Next step preview */}
+            {activeNavigator.steps[activeNavigator.currentStepIndex + 1] && (
+              <Text style={styles.nextStepText} numberOfLines={1}>
+                Next: {activeNavigator.steps[activeNavigator.currentStepIndex + 1].icon} {activeNavigator.steps[activeNavigator.currentStepIndex + 1].instruction}
               </Text>
             )}
           </View>
-          <Text style={styles.instructionText}>{currentStep.instruction}</Text>
-          {/* Next step preview */}
-          {activeNavigator.steps[activeNavigator.currentStepIndex + 1] && (
-            <Text style={styles.nextStepText} numberOfLines={1}>
-              Next: {activeNavigator.steps[activeNavigator.currentStepIndex + 1].icon} {activeNavigator.steps[activeNavigator.currentStepIndex + 1].instruction}
-            </Text>
-          )}
         </View>
-      </View>
 
-      {/* Bottom Route Status Card */}
-      <View style={styles.bottomCard}>
+        {/* Target Destination Info */}
         <View style={styles.targetHeaderRow}>
           <View style={[styles.targetBadge, { backgroundColor: activeNavigator.color }]}>
             <Text style={styles.targetBadgeText}>{activeNavigator.facultyName.slice(0, 4)}</Text>
@@ -129,7 +119,6 @@ export default function TurnByTurnNavigator() {
           <TouchableOpacity
             style={styles.simBtn}
             onPress={() => {
-              // Recalculate route from current GPS position
               const fac = {
                 id: activeNavigator.facultyId,
                 name: activeNavigator.facultyName,
@@ -155,7 +144,7 @@ export default function TurnByTurnNavigator() {
             activeOpacity={0.85}
           >
             <Text style={styles.checkInNavBtnText}>
-              {activeNavigator.isArrived ? '🎉 Arrived! Check-in' : '📍 I have arrived!'}
+              {activeNavigator.isArrived ? '📷 Scan QR to Check-in' : '📍 I have arrived!'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -171,29 +160,22 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     zIndex: 100,
     padding: 12,
   },
-  topBanner: {
+  currentStepSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 14,
-    borderLeftWidth: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 8,
-    marginTop: 8,
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
   },
   stepIconBox: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#334155',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -201,23 +183,21 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   bannerTag: {
-    color: '#F59E0B',
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 1,
   },
-  stepCounter: {
-    color: '#94A3B8',
-    fontSize: 10,
-    fontWeight: '700',
-    marginLeft: 8,
-  },
   instructionText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     marginTop: 2,
-    lineHeight: 18,
+    lineHeight: 20,
+  },
+  nextStepText: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 4,
   },
   bottomCard: {
     backgroundColor: '#FFFFFF',

@@ -94,7 +94,7 @@ export default function StaffScreen() {
         <View style={[styles.dashboardHeader, { backgroundColor: staffSession.facultyColor }]}>
           <Text style={styles.dashBadge}>{staffSession.facultyBadge}</Text>
           <Text style={styles.dashFacultyName}>{staffSession.facultyName}</Text>
-          <Text style={styles.dashSubtitle}>Staff Dashboard — Open House 2026</Text>
+          <Text style={styles.dashSubtitle}>Staff Dashboard — Open House</Text>
           <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
             <Text style={styles.logoutBtnText}>Staff Logout</Text>
           </TouchableOpacity>

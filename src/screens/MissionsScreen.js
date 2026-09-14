@@ -8,19 +8,15 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import { MISSIONS } from '../constants/missions';
+import { FACULTIES } from '../constants/faculties';
 import { useApp } from '../context/AppContext';
 
 export default function MissionsScreen() {
-  const { completedActivities, visitedFaculties, earnedXP } = useApp();
+  const { visitedFaculties, earnedXP } = useApp();
 
   // Calculate Level based on XP
   const level = Math.floor(earnedXP / 50) + 1;
   const xpInCurrentLevel = earnedXP % 50;
-
-  const handleClaim = (mission) => {
-    Alert.alert('🎉 Congratulations!', `You earned "${mission.rewardName}" (+${mission.xpReward} XP)`);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,46 +43,93 @@ export default function MissionsScreen() {
       </View>
 
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionHeader}>🎯 Missions & Quests</Text>
-        <Text style={styles.sectionSub}>Complete missions to unlock special badges and limited rewards</Text>
+        {/* Stamp Progress Banner */}
+        <View style={styles.stampBanner}>
+          <View style={{ marginBottom: 12 }}>
+            <Text style={styles.stampBannerTag}>MAP EXPLORER COLLECTION</Text>
+            <Text style={styles.stampBannerTitle}>
+              Collected {visitedFaculties.length} / 9 Stamps
+            </Text>
+          </View>
+        </View>
 
-        {MISSIONS.map((m) => {
-          const currentCount =
-            m.requirementType === 'activities' ? completedActivities.length : visitedFaculties.length;
-          const isComplete = currentCount >= m.targetCount;
-          const progressPct = Math.min(100, (currentCount / m.targetCount) * 100);
+        {/* 9 Faculty Stamp Grid (Old Passport UI) */}
+        <Text style={styles.sectionTitle}>🗺️ Faculty Stamps Collection</Text>
+        <View style={styles.stampGrid}>
+          {FACULTIES.map((fac, idx) => {
+            const isVisited = visitedFaculties.includes(fac.id);
+            return (
+              <View
+                key={fac.id}
+                style={[
+                  styles.stampCard,
+                  isVisited ? { borderColor: fac.color } : styles.stampCardLocked,
+                ]}
+              >
+                <View style={styles.stampNumberBadge}>
+                  <Text style={styles.stampNumberText}>
+                    {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.oldStampCircle,
+                    isVisited ? { backgroundColor: fac.color } : styles.oldStampCircleLocked,
+                  ]}
+                >
+                  <Text style={styles.oldStampIcon}>{isVisited ? fac.badgeIcon : '🔒'}</Text>
+                </View>
+
+                <Text style={styles.stampCode}>{fac.code}</Text>
+                <Text style={styles.stampName} numberOfLines={2}>
+                  {fac.nameEn}
+                </Text>
+
+                <View
+                  style={[
+                    styles.statusPill,
+                    isVisited ? styles.statusPillVisited : styles.statusPillLocked,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.statusPillText,
+                      isVisited ? styles.statusVisitedText : styles.statusLockedText,
+                    ]}
+                  >
+                    {isVisited ? '✓ Visited' : 'Locked'}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Faculty Missions List */}
+        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>🏫 Faculty Stamp Missions</Text>
+        {FACULTIES.map((fac) => {
+          const isComplete = visitedFaculties.includes(fac.id);
 
           return (
-            <View key={m.id} style={[styles.missionCard, isComplete && styles.missionCardComplete]}>
+            <View key={fac.id} style={[styles.missionCard, isComplete && styles.missionCardComplete]}>
               <View style={styles.missionHeaderRow}>
-                <Text style={styles.missionIcon}>{m.rewardIcon}</Text>
-                <View style={{ flex: 1, marginLeft: 10 }}>
-                  <Text style={styles.missionTitle}>{m.title}</Text>
-                  <Text style={styles.missionDesc}>{m.description}</Text>
+                <View style={[styles.stampCircle, isComplete ? { backgroundColor: fac.color } : styles.stampCircleLocked]}>
+                  <Text style={styles.stampIcon}>{isComplete ? fac.badgeIcon : '🔒'}</Text>
+                </View>
+                <View style={{ flex: 1, marginLeft: 14 }}>
+                  <Text style={styles.missionTitle}>{fac.nameEn}</Text>
+                  <Text style={styles.missionDesc}>📍 {fac.building}</Text>
                 </View>
                 {isComplete ? (
-                  <TouchableOpacity
-                    style={styles.claimBtn}
-                    onPress={() => handleClaim(m)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.claimBtnText}>Claim ✓</Text>
-                  </TouchableOpacity>
+                  <View style={styles.claimedBtn}>
+                    <Text style={styles.claimedBtnText}>Claimed ✓</Text>
+                  </View>
                 ) : (
                   <View style={styles.xpRewardTag}>
-                    <Text style={styles.xpRewardTagText}>+{m.xpReward} XP</Text>
+                    <Text style={styles.xpRewardTagText}>+50 XP</Text>
                   </View>
                 )}
-              </View>
-
-              {/* Progress Bar inside Mission Card */}
-              <View style={styles.missionProgressWrapper}>
-                <View style={styles.missionProgressBg}>
-                  <View style={[styles.missionProgressFill, { width: `${progressPct}%` }]} />
-                </View>
-                <Text style={styles.missionProgressText}>
-                  {currentCount} / {m.targetCount} ({Math.round(progressPct)}%)
-                </Text>
               </View>
             </View>
           );
@@ -165,17 +208,117 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
-  sectionHeader: {
-    fontSize: 18,
+  stampBanner: {
+    backgroundColor: '#1E293B',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+  },
+  stampBannerTag: {
+    color: '#F59E0B',
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  stampBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  sectionTitle: {
+    fontSize: 16,
     fontWeight: '800',
     color: '#1E293B',
+    marginBottom: 12,
   },
-  sectionSub: {
-    fontSize: 12,
+  stampGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  stampCard: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  stampCardLocked: {
+    backgroundColor: '#F1F5F9',
+    borderColor: '#E2E8F0',
+  },
+  stampNumberBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 10,
+    backgroundColor: '#E2E8F0',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  stampNumberText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#475569',
+  },
+  oldStampCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  oldStampCircleLocked: {
+    backgroundColor: '#CBD5E1',
+  },
+  oldStampIcon: {
+    fontSize: 24,
+  },
+  stampCode: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1E293B',
+    marginTop: 8,
+  },
+  stampName: {
+    fontSize: 11,
     color: '#64748B',
+    textAlign: 'center',
     marginTop: 2,
-    marginBottom: 14,
+    height: 28,
   },
+  statusPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  statusPillVisited: {
+    backgroundColor: '#D1FAE5',
+  },
+  statusPillLocked: {
+    backgroundColor: '#E2E8F0',
+  },
+  statusPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  statusVisitedText: {
+    color: '#059669',
+  },
+  statusLockedText: {
+    color: '#64748B',
+  },
+
   missionCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
@@ -196,9 +339,6 @@ const styles = StyleSheet.create({
   missionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  missionIcon: {
-    fontSize: 28,
   },
   missionTitle: {
     fontSize: 14,
@@ -221,38 +361,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
   },
-  claimBtn: {
-    backgroundColor: '#10B981',
+  claimedBtn: {
+    backgroundColor: '#E2E8F0',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
   },
-  claimBtnText: {
-    color: '#FFFFFF',
+  claimedBtnText: {
+    color: '#94A3B8',
     fontSize: 12,
     fontWeight: 'bold',
   },
-  missionProgressWrapper: {
-    marginTop: 12,
-    flexDirection: 'row',
+  stampCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  missionProgressBg: {
-    flex: 1,
-    height: 6,
+  stampCircleLocked: {
     backgroundColor: '#E2E8F0',
-    borderRadius: 3,
-    overflow: 'hidden',
-    marginRight: 10,
   },
-  missionProgressFill: {
-    height: '100%',
-    backgroundColor: '#F15A24',
-    borderRadius: 3,
-  },
-  missionProgressText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#64748B',
+  stampIcon: {
+    fontSize: 22,
   },
 });

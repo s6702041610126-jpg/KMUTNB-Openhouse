@@ -31,7 +31,7 @@ export default function RegistrationModal({ visible, onClose }) {
             {/* Logo / Header Banner */}
             <View style={styles.headerBanner}>
               <Text style={styles.headerIcon}>🎓</Text>
-              <Text style={styles.headerTitle}>KMUTNB OPEN HOUSE 2026</Text>
+              <Text style={styles.headerTitle}>KMUTNB OPEN HOUSE</Text>
               <Text style={styles.headerSubtitle}>
                 Fill in your info and choose your avatar to begin!
               </Text>
@@ -78,8 +78,6 @@ export default function RegistrationModal({ visible, onClose }) {
                   >
                     {isSelected && <Text style={styles.checkMark}>✓</Text>}
                     <Text style={styles.avatarIcon}>{item.icon}</Text>
-                    <Text style={[styles.avatarName, { color: item.color }]}>{item.name}</Text>
-                    <Text style={styles.avatarTitle}>{item.title}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -176,13 +174,15 @@ const styles = StyleSheet.create({
   avatarGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 16,
+    justifyContent: 'center',
   },
   avatarCard: {
-    width: '47.5%',
-    borderRadius: 20,
-    padding: 14,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
     position: 'relative',
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
   },
   checkMark: {
     position: 'absolute',
-    top: 8,
-    right: 10,
+    top: 0,
+    right: 0,
     backgroundColor: '#10B981',
     color: '#FFFFFF',
     borderRadius: 10,
@@ -210,17 +210,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   avatarIcon: {
-    fontSize: 40,
-  },
-  avatarName: {
-    fontSize: 14,
-    fontWeight: '800',
-    marginTop: 6,
-  },
-  avatarTitle: {
-    fontSize: 11,
-    color: '#64748B',
-    marginTop: 2,
+    fontSize: 42,
   },
   footer: {
     padding: 16,

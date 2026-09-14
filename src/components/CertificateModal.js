@@ -44,14 +44,14 @@ export default function CertificateModal({ visible, onClose }) {
                   <Text style={styles.userSchool}>{userProfile.school}</Text>
 
                   <Text style={styles.certDescription}>
-                    Has participated in activities and completed missions at KMUTNB OPEN HOUSE 2026{'\n'}
+                    Has participated in activities and completed missions at KMUTNB OPEN HOUSE{'\n'}
                     Completed {completedActivities.length} activities | {visitedFaculties.length} faculties ({earnedXP} XP)
                   </Text>
 
                   {/* Stamp Badge */}
                   <View style={styles.badgeSeal}>
                     <Text style={styles.badgeSealText}>KMUTNB OFFICIAL SEAL</Text>
-                    <Text style={styles.badgeSealIcon}>⭐ 2026 ⭐</Text>
+                    <Text style={styles.badgeSealIcon}>⭐ CERTIFIED ⭐</Text>
                   </View>
 
                   <View style={styles.issueRow}>

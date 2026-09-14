@@ -576,15 +576,6 @@ export default function InAppMapView({ onSelectFaculty }) {
             🛰️ Google Satellite
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.modeTab, tileMode === 'google_embed' && styles.modeTabActive]}
-          onPress={() => setTileMode('google_embed')}
-        >
-          <Text style={[styles.modeTabText, tileMode === 'google_embed' && styles.modeTabTextActive]}>
-            📍 Google Embed
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {tileMode !== 'google_embed' ? (
@@ -647,8 +638,26 @@ export default function InAppMapView({ onSelectFaculty }) {
           </View>
           <WebView
             originWhitelist={['*']}
-            source={{ uri: selectedFacultyForEmbed.embedUrl }}
+            source={{ 
+              html: `
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                    <style>
+                      body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                      iframe { border: none; width: 100%; height: 100%; }
+                    </style>
+                  </head>
+                  <body>
+                    <iframe src="${selectedFacultyForEmbed.embedUrl}" allowfullscreen></iframe>
+                  </body>
+                </html>
+              ` 
+            }}
             style={styles.webview}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
           />
         </View>
       )}

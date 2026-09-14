@@ -40,7 +40,7 @@ export default function ProfileScreen() {
           <Text style={[styles.userQuote, { color: selectedAvatar.color }]}>"{selectedAvatar.quote}"</Text>
 
           <TouchableOpacity style={styles.editBtn} onPress={() => setIsEditModalOpen(true)}>
-            <Text style={styles.editBtnText}>✏️ Edit Profile / Change Avatar</Text>
+            <Text style={styles.editBtnText}>Edit Profile / Change Avatar</Text>
           </TouchableOpacity>
         </View>
 
@@ -48,57 +48,34 @@ export default function ProfileScreen() {
         <View style={styles.statsGrid}>
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{earnedXP}</Text>
-            <Text style={styles.statLabel}>✨ Total XP</Text>
+            <Text style={styles.statLabel}>Total XP</Text>
           </View>
 
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{visitedFaculties.length}/9</Text>
-            <Text style={styles.statLabel}>🏫 Faculty Stamps</Text>
+            <Text style={styles.statLabel}>Faculty Stamps</Text>
           </View>
 
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{completedActivities.length}</Text>
-            <Text style={styles.statLabel}>🎯 Activities Done</Text>
+            <Text style={styles.statLabel}>Activities Done</Text>
           </View>
         </View>
 
         {/* Action List */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>⚙️ Menu & Settings</Text>
+          <Text style={styles.sectionTitle}>Menu & Settings</Text>
 
           {/* Certificate Action */}
           <TouchableOpacity style={styles.menuRow} onPress={() => setIsCertModalOpen(true)}>
-            <Text style={styles.menuIcon}>📜</Text>
-            <View style={{ flex: 1, marginLeft: 12 }}>
+            <View style={{ flex: 1, marginLeft: 4 }}>
               <Text style={styles.menuTitle}>KMUTNB Open House Certificate</Text>
               <Text style={styles.menuSub}>View and download your participation certificate</Text>
             </View>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          {/* QR Scanner Action */}
-          <TouchableOpacity style={styles.menuRow} onPress={() => setIsQRScannerOpen(true)}>
-            <Text style={styles.menuIcon}>📷</Text>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.menuTitle}>Scan QR Code Check-in</Text>
-              <Text style={styles.menuSub}>Scan to earn XP or collect stamps</Text>
-            </View>
-            <Text style={styles.menuArrow}>›</Text>
-          </TouchableOpacity>
 
-          {/* Toggle Staff Mode */}
-          <View style={styles.menuRow}>
-            <Text style={styles.menuIcon}>👔</Text>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.menuTitle}>Staff Mode</Text>
-              <Text style={styles.menuSub}>Enable to scan and verify visitor check-ins</Text>
-            </View>
-            <Switch
-              value={userProfile.role === 'staff'}
-              onValueChange={toggleStaffMode}
-              trackColor={{ false: '#CBD5E1', true: '#F15A24' }}
-            />
-          </View>
         </View>
 
         <View style={{ height: 30 }} />
