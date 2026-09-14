@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,54 +6,39 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  Alert,
 } from 'react-native';
 import { FACULTIES } from '../constants/faculties';
 import { useApp } from '../context/AppContext';
 
 export default function MissionsScreen() {
-  const { visitedFaculties, earnedXP } = useApp();
+  const { visitedFaculties, completedActivities, setIsQRScannerOpen, setTargetScanFacultyId } = useApp();
+  const [expandedFaculty, setExpandedFaculty] = useState(null);
 
-  // Calculate Level based on XP
-  const level = Math.floor(earnedXP / 50) + 1;
-  const xpInCurrentLevel = earnedXP % 50;
+  const handleScanQR = (facultyId) => {
+    setTargetScanFacultyId(facultyId);
+    setIsQRScannerOpen(true);
+  };
+
+  const toggleExpand = (facultyId) => {
+    setExpandedFaculty(prev => prev === facultyId ? null : facultyId);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top XP / Level Header */}
-      <View style={styles.xpCard}>
-        <View style={styles.levelRow}>
-          <View style={styles.levelBadge}>
-            <Text style={styles.levelBadgeText}>LVL {level}</Text>
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.userLevelTitle}>KMUTNB Campus Explorer</Text>
-            <Text style={styles.xpAmountText}>{earnedXP} Total XP</Text>
-          </View>
-          <Text style={styles.trophyIcon}>🏆</Text>
-        </View>
-
-        {/* Level Progress Bar */}
-        <View style={styles.progressBg}>
-          <View style={[styles.progressFill, { width: `${(xpInCurrentLevel / 50) * 100}%` }]} />
-        </View>
-        <Text style={styles.progressSubText}>
-          {50 - xpInCurrentLevel} XP until Level {level + 1}
-        </Text>
-      </View>
-
       <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Stamp Progress Banner */}
+
+        {/* Stamp Collection Banner */}
         <View style={styles.stampBanner}>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.stampBannerTag}>MAP EXPLORER COLLECTION</Text>
-            <Text style={styles.stampBannerTitle}>
-              Collected {visitedFaculties.length} / 9 Stamps
-            </Text>
+          <Text style={styles.stampBannerTag}>MAP EXPLORER COLLECTION</Text>
+          <Text style={styles.stampBannerTitle}>
+            {visitedFaculties.length} / 9 Faculties Visited
+          </Text>
+          <View style={styles.progressBg}>
+            <View style={[styles.progressFill, { width: `${(visitedFaculties.length / 9) * 100}%` }]} />
           </View>
         </View>
 
-        {/* 9 Faculty Stamp Grid (Old Passport UI) */}
+        {/* 3×3 Faculty Stamp Grid */}
         <Text style={styles.sectionTitle}>🗺️ Faculty Stamps Collection</Text>
         <View style={styles.stampGrid}>
           {FACULTIES.map((fac, idx) => {
@@ -62,329 +47,383 @@ export default function MissionsScreen() {
               <View
                 key={fac.id}
                 style={[
-                  styles.stampCard,
-                  isVisited ? { borderColor: fac.color } : styles.stampCardLocked,
+                  styles.stampCell,
+                  isVisited ? { borderColor: fac.color, backgroundColor: '#fff' } : styles.stampCellLocked,
                 ]}
               >
-                <View style={styles.stampNumberBadge}>
-                  <Text style={styles.stampNumberText}>
-                    {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
-                  </Text>
+                <Text style={styles.stampCellNum}>{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}</Text>
+                <View style={[
+                  styles.stampCellCircle,
+                  isVisited ? { backgroundColor: fac.color } : styles.stampCellCircleLocked,
+                ]}>
+                  <Text style={styles.stampCellIcon}>{isVisited ? fac.badgeIcon : '🔒'}</Text>
                 </View>
-
-                <View
-                  style={[
-                    styles.oldStampCircle,
-                    isVisited ? { backgroundColor: fac.color } : styles.oldStampCircleLocked,
-                  ]}
-                >
-                  <Text style={styles.oldStampIcon}>{isVisited ? fac.badgeIcon : '🔒'}</Text>
-                </View>
-
-                <Text style={styles.stampCode}>{fac.code}</Text>
-                <Text style={styles.stampName} numberOfLines={2}>
-                  {fac.nameEn}
-                </Text>
-
-                <View
-                  style={[
-                    styles.statusPill,
-                    isVisited ? styles.statusPillVisited : styles.statusPillLocked,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.statusPillText,
-                      isVisited ? styles.statusVisitedText : styles.statusLockedText,
-                    ]}
-                  >
-                    {isVisited ? '✓ Visited' : 'Locked'}
-                  </Text>
-                </View>
+                <Text style={styles.stampCellCode}>{fac.code}</Text>
+                {isVisited && <Text style={styles.stampCellDone}>✓</Text>}
               </View>
             );
           })}
         </View>
 
         {/* Faculty Missions List */}
-        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>🏫 Faculty Stamp Missions</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 22 }]}>🏫 Faculty Activities & Missions</Text>
         {FACULTIES.map((fac) => {
-          const isComplete = visitedFaculties.includes(fac.id);
+          const isStampClaimed = visitedFaculties.includes(fac.id);
+          const isExpanded = expandedFaculty === fac.id;
+
+          const doneActivities = fac.activities.filter(a =>
+            completedActivities.some(ca => ca.activityId === a.id)
+          );
 
           return (
-            <View key={fac.id} style={[styles.missionCard, isComplete && styles.missionCardComplete]}>
-              <View style={styles.missionHeaderRow}>
-                <View style={[styles.stampCircle, isComplete ? { backgroundColor: fac.color } : styles.stampCircleLocked]}>
-                  <Text style={styles.stampIcon}>{isComplete ? fac.badgeIcon : '🔒'}</Text>
+            <View key={fac.id} style={[styles.missionCard, isStampClaimed && styles.missionCardDone]}>
+              {/* Faculty Header Row — tap to expand */}
+              <TouchableOpacity
+                style={styles.missionHeaderRow}
+                onPress={() => toggleExpand(fac.id)}
+                activeOpacity={0.8}
+              >
+                <View style={[
+                  styles.facIconCircle,
+                  isStampClaimed ? { backgroundColor: fac.color } : styles.facIconCircleLocked,
+                ]}>
+                  <Text style={styles.facIcon}>{isStampClaimed ? fac.badgeIcon : '🔒'}</Text>
                 </View>
-                <View style={{ flex: 1, marginLeft: 14 }}>
-                  <Text style={styles.missionTitle}>{fac.nameEn}</Text>
-                  <Text style={styles.missionDesc}>📍 {fac.building}</Text>
+
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <Text style={styles.facName}>{fac.nameEn}</Text>
+                  <Text style={styles.facBuilding}>📍 {fac.building}</Text>
+                  <Text style={styles.facProgress}>
+                    {doneActivities.length}/{fac.activities.length} activities completed
+                  </Text>
                 </View>
-                {isComplete ? (
-                  <View style={styles.claimedBtn}>
-                    <Text style={styles.claimedBtnText}>Claimed ✓</Text>
-                  </View>
-                ) : (
-                  <View style={styles.xpRewardTag}>
-                    <Text style={styles.xpRewardTagText}>+50 XP</Text>
-                  </View>
-                )}
-              </View>
+
+                <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                  {isStampClaimed && (
+                    <View style={styles.stampedBadge}>
+                      <Text style={styles.stampedBadgeText}>✓ Stamped</Text>
+                    </View>
+                  )}
+                  <Text style={styles.expandArrow}>{isExpanded ? '▲' : '▼'}</Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Expanded Activity List */}
+              {isExpanded && (
+                <View style={styles.activitiesContainer}>
+                  <View style={styles.divider} />
+                  {fac.activities.map((act) => {
+                    const isDone = completedActivities.some(ca => ca.activityId === act.id);
+                    return (
+                      <View key={act.id} style={[styles.activityRow, isDone && styles.activityRowDone]}>
+                        <View style={styles.activityLeft}>
+                          <View style={styles.activityCategoryTag}>
+                            <Text style={styles.activityCategoryText}>{act.category}</Text>
+                          </View>
+                          <Text style={styles.activityTitle}>{act.title}</Text>
+                          <Text style={styles.activityRoom}>📍 {act.room}</Text>
+                          <Text style={styles.activityXP}>✨ +{act.xp} XP</Text>
+                        </View>
+
+                        {isDone ? (
+                          <View style={styles.doneTag}>
+                            <Text style={styles.doneTagText}>Done ✓</Text>
+                          </View>
+                        ) : (
+                          <TouchableOpacity
+                            style={[styles.scanBtn, { backgroundColor: fac.color }]}
+                            onPress={() => handleScanQR(fac.id)}
+                            activeOpacity={0.85}
+                          >
+                            <Text style={styles.scanBtnIcon}>📷</Text>
+                            <Text style={styles.scanBtnText}>Scan QR</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           );
         })}
 
-        <View style={{ height: 30 }} />
+        <View style={{ height: 36 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const CELL_SIZE = '30%';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
   },
-  xpCard: {
-    backgroundColor: '#F15A24',
-    margin: 16,
-    borderRadius: 24,
-    padding: 18,
-    shadowColor: '#F15A24',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  levelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  levelBadge: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
-  },
-  levelBadgeText: {
-    color: '#F15A24',
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  userLevelTitle: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  xpAmountText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 2,
-  },
-  trophyIcon: {
-    fontSize: 32,
-  },
-  progressBg: {
-    height: 8,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 4,
-    marginTop: 14,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 4,
-  },
-  progressSubText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: 11,
-    marginTop: 6,
-    textAlign: 'right',
-  },
   scrollContent: {
     flex: 1,
     paddingHorizontal: 16,
   },
+
+  // ── Banner ────────────────────────────────────────────────────────────────
   stampBanner: {
     backgroundColor: '#1E293B',
-    borderRadius: 16,
+    borderRadius: 18,
     padding: 16,
-    marginBottom: 16,
+    marginTop: 14,
+    marginBottom: 18,
   },
   stampBannerTag: {
     color: '#F59E0B',
     fontSize: 9,
     fontWeight: '800',
+    letterSpacing: 1,
   },
   stampBannerTitle: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginTop: 2,
-  },
-  sectionTitle: {
     fontSize: 16,
+    fontWeight: '800',
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  progressBg: {
+    height: 6,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#F59E0B',
+    borderRadius: 3,
+  },
+
+  // ── Section Title ─────────────────────────────────────────────────────────
+  sectionTitle: {
+    fontSize: 15,
     fontWeight: '800',
     color: '#1E293B',
     marginBottom: 12,
   },
+
+  // ── 3×3 Stamp Grid ────────────────────────────────────────────────────────
   stampGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 8,
+    justifyContent: 'space-between',
   },
-  stampCard: {
-    width: '48%',
+  stampCell: {
+    width: CELL_SIZE,
+    aspectRatio: 0.85,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 14,
-    alignItems: 'center',
+    borderRadius: 16,
     borderWidth: 2,
     borderColor: '#E2E8F0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
   },
-  stampCardLocked: {
+  stampCellLocked: {
     backgroundColor: '#F1F5F9',
     borderColor: '#E2E8F0',
   },
-  stampNumberBadge: {
+  stampCellNum: {
     position: 'absolute',
-    top: 8,
-    left: 10,
-    backgroundColor: '#E2E8F0',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  stampNumberText: {
+    top: 6,
+    left: 8,
     fontSize: 9,
     fontWeight: '800',
-    color: '#475569',
+    color: '#94A3B8',
   },
-  oldStampCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+  stampCellCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
   },
-  oldStampCircleLocked: {
+  stampCellCircleLocked: {
     backgroundColor: '#CBD5E1',
   },
-  oldStampIcon: {
-    fontSize: 24,
+  stampCellIcon: {
+    fontSize: 20,
   },
-  stampCode: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginTop: 8,
-  },
-  stampName: {
-    fontSize: 11,
-    color: '#64748B',
-    textAlign: 'center',
-    marginTop: 2,
-    height: 28,
-  },
-  statusPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-    marginTop: 8,
-  },
-  statusPillVisited: {
-    backgroundColor: '#D1FAE5',
-  },
-  statusPillLocked: {
-    backgroundColor: '#E2E8F0',
-  },
-  statusPillText: {
+  stampCellCode: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
+    color: '#334155',
+    marginTop: 6,
   },
-  statusVisitedText: {
-    color: '#059669',
-  },
-  statusLockedText: {
-    color: '#64748B',
+  stampCellDone: {
+    position: 'absolute',
+    top: 5,
+    right: 7,
+    fontSize: 11,
+    color: '#10B981',
+    fontWeight: '900',
   },
 
+  // ── Mission Card ──────────────────────────────────────────────────────────
   missionCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 16,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
     elevation: 2,
   },
-  missionCardComplete: {
-    backgroundColor: '#F0FDF4',
+  missionCardDone: {
     borderColor: '#BBF7D0',
+    backgroundColor: '#F0FDF4',
   },
   missionHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 14,
   },
-  missionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1E293B',
-  },
-  missionDesc: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
-  },
-  xpRewardTag: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  xpRewardTagText: {
-    color: '#D97706',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  claimedBtn: {
-    backgroundColor: '#E2E8F0',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-  },
-  claimedBtnText: {
-    color: '#94A3B8',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  stampCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  facIconCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  stampCircleLocked: {
+  facIconCircleLocked: {
     backgroundColor: '#E2E8F0',
   },
-  stampIcon: {
+  facIcon: {
     fontSize: 22,
+  },
+  facName: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#1E293B',
+  },
+  facBuilding: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  facProgress: {
+    fontSize: 10,
+    color: '#94A3B8',
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  stampedBadge: {
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  stampedBadgeText: {
+    color: '#059669',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  expandArrow: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginTop: 4,
+  },
+
+  // ── Activity Rows ─────────────────────────────────────────────────────────
+  activitiesContainer: {
+    paddingHorizontal: 14,
+    paddingBottom: 14,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginBottom: 12,
+  },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  activityRowDone: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#BBF7D0',
+  },
+  activityLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  activityCategoryTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 5,
+  },
+  activityCategoryText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  activityTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1E293B',
+    lineHeight: 17,
+  },
+  activityRoom: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 3,
+  },
+  activityXP: {
+    fontSize: 11,
+    color: '#D97706',
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  scanBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    borderRadius: 12,
+    gap: 4,
+    minWidth: 76,
+    justifyContent: 'center',
+  },
+  scanBtnIcon: {
+    fontSize: 14,
+  },
+  scanBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  doneTag: {
+    backgroundColor: '#E2E8F0',
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    borderRadius: 12,
+    minWidth: 76,
+    alignItems: 'center',
+  },
+  doneTagText: {
+    color: '#64748B',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
