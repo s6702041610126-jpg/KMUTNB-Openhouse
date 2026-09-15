@@ -46,16 +46,6 @@ export default function MapScreen() {
                 Stamps collected: <Text style={styles.boldText}>{visitedFaculties.length}/9 Faculties</Text>
               </Text>
             </View>
-
-            {/* Quick Scan QR Floating Button */}
-            <TouchableOpacity
-              style={styles.scanBtn}
-              onPress={() => setIsQRScannerOpen(true)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.scanBtnIcon}>📷</Text>
-              <Text style={styles.scanBtnText}>Scan QR</Text>
-            </TouchableOpacity>
           </View>
 
           {/* Quick Filter Horizontal Scroll */}

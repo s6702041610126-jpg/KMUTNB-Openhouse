@@ -7,15 +7,16 @@ import {
   Alert,
 } from 'react-native';
 import { useApp } from '../context/AppContext';
+import { FACULTIES } from '../constants/faculties';
 
 export default function TurnByTurnNavigator() {
   const {
     activeNavigator,
     clearNavigation,
+    checkInFacultyStamp,
     checkInActivity,
+    visitedFaculties,
     startNavigation,
-    setIsQRScannerOpen,
-    setTargetScanFacultyId,
   } = useApp();
 
   if (!activeNavigator) return null;
@@ -23,13 +24,25 @@ export default function TurnByTurnNavigator() {
   const currentStep =
     activeNavigator.steps[activeNavigator.currentStepIndex] || activeNavigator.steps[0];
 
+  const isAlreadyVisited = visitedFaculties.includes(activeNavigator?.facultyId);
+
   const handleArrivalCheckIn = () => {
-    // Restrict the scanner to only accept this faculty
-    setTargetScanFacultyId(activeNavigator.facultyId);
-    
-    // Open QR Scanner to actually claim the mission/activity
-    setIsQRScannerOpen(true);
+    if (isAlreadyVisited) {
+      clearNavigation();
+      return;
+    }
+    // Unlock badge immediately on arrival
+    checkInFacultyStamp(activeNavigator.facultyId);
+    const fac = FACULTIES.find(f => f.id === activeNavigator.facultyId);
+    if (fac?.activities?.length > 0) {
+      checkInActivity(fac.id, fac.activities[0].id, fac.activities[0].xp);
+    }
     clearNavigation();
+    Alert.alert(
+      '🎉 Badge Unlocked!',
+      `You arrived at ${activeNavigator.facultyName}!\nYour stamp has been added. Check Missions to see it.`,
+      [{ text: 'OK' }]
+    );
   };
 
   return (
@@ -140,13 +153,15 @@ export default function TurnByTurnNavigator() {
           <TouchableOpacity
             style={[
               styles.checkInNavBtn,
-              activeNavigator.isArrived && styles.checkInNavBtnReady,
+              { backgroundColor: isAlreadyVisited ? '#94A3B8' : activeNavigator.isArrived ? '#10B981' : '#F15A24' },
             ]}
             onPress={handleArrivalCheckIn}
             activeOpacity={0.85}
           >
             <Text style={styles.checkInNavBtnText}>
-              {activeNavigator.isArrived ? '📷 Scan QR to Check-in' : '📍 I have arrived!'}
+              {isAlreadyVisited
+                ? '✓ Already Visited'
+                : '📍 I have arrived!'}
             </Text>
           </TouchableOpacity>
         </View>

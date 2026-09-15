@@ -18,6 +18,8 @@ export default function QRScannerModal({ visible, onClose }) {
     redeemedRewards,
     targetScanFacultyId,
     setTargetScanFacultyId,
+    targetScanActivityId,
+    setTargetScanActivityId,
   } = useApp();
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -64,7 +66,8 @@ export default function QRScannerModal({ visible, onClose }) {
     setSuccessMessage(null);
     setErrorMessage(null);
     successAnim.setValue(0);
-    setTargetScanFacultyId(null); // Clear any navigation-enforced target
+    setTargetScanFacultyId(null);
+    setTargetScanActivityId(null);
     onClose();
   };
 
@@ -87,21 +90,36 @@ export default function QRScannerModal({ visible, onClose }) {
       return;
     }
 
-    // Student mode: scan Faculty QR from Staff device
+    // ── Missions mode: targetScanFacultyId is set → any QR unlocks that activity ──
+    if (targetScanFacultyId) {
+      const fac = FACULTIES.find((f) => f.id === targetScanFacultyId);
+      if (fac) {
+        // Unlock the specific activity (or fallback to first activity)
+        const act = targetScanActivityId
+          ? fac.activities.find(a => a.id === targetScanActivityId)
+          : fac.activities[0];
+        if (act) {
+          checkInActivity(fac.id, act.id, act.xp);
+        }
+        // Also stamp the faculty if not yet visited
+        checkInFacultyStamp(fac.id);
+        showSuccess({
+          icon: '🎉',
+          title: 'Activity Completed!',
+          sub: act ? act.title : fac.nameEn,
+          detail: `📍 ${act?.room || fac.building}\n✨ +${act?.xp || 10} XP`,
+          color: fac.color,
+        });
+      }
+      return;
+    }
+
+    // ── General scan: validate staff faculty QR format ──
     const result = validateFacultyQR(data);
     if (result.valid) {
-      // Check if we are enforcing a specific faculty (via Navigation)
-      if (targetScanFacultyId && targetScanFacultyId !== result.facultyId) {
-        const expectedFac = FACULTIES.find((f) => f.id === targetScanFacultyId);
-        setErrorMessage(`Please scan the QR code for ${expectedFac?.nameEn || 'the correct faculty'}!`);
-        setTimeout(() => { setScanned(false); setErrorMessage(null); }, 3000);
-        return;
-      }
-
       const fac = FACULTIES.find((f) => f.id === result.facultyId);
       if (fac) {
         checkInFacultyStamp(fac.id);
-        // Also check-in first activity for XP
         if (fac.activities && fac.activities.length > 0) {
           checkInActivity(fac.id, fac.activities[0].id, fac.activities[0].xp);
         }

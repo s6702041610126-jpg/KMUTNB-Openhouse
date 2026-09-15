@@ -11,11 +11,12 @@ import { FACULTIES } from '../constants/faculties';
 import { useApp } from '../context/AppContext';
 
 export default function MissionsScreen() {
-  const { visitedFaculties, completedActivities, setIsQRScannerOpen, setTargetScanFacultyId } = useApp();
+  const { visitedFaculties, completedActivities, setIsQRScannerOpen, setTargetScanFacultyId, setTargetScanActivityId } = useApp();
   const [expandedFaculty, setExpandedFaculty] = useState(null);
 
-  const handleScanQR = (facultyId) => {
+  const handleScanQR = (facultyId, activityId) => {
     setTargetScanFacultyId(facultyId);
+    setTargetScanActivityId(activityId);
     setIsQRScannerOpen(true);
   };
 
@@ -115,7 +116,10 @@ export default function MissionsScreen() {
                   {fac.activities.map((act) => {
                     const isDone = completedActivities.some(ca => ca.activityId === act.id);
                     return (
-                      <View key={act.id} style={[styles.activityRow, isDone && styles.activityRowDone]}>
+                      <View key={act.id} style={[
+                        styles.activityRow,
+                        isDone && styles.activityRowDone,
+                      ]}>
                         <View style={styles.activityLeft}>
                           <View style={styles.activityCategoryTag}>
                             <Text style={styles.activityCategoryText}>{act.category}</Text>
@@ -132,7 +136,7 @@ export default function MissionsScreen() {
                         ) : (
                           <TouchableOpacity
                             style={[styles.scanBtn, { backgroundColor: fac.color }]}
-                            onPress={() => handleScanQR(fac.id)}
+                            onPress={() => handleScanQR(fac.id, act.id)}
                             activeOpacity={0.85}
                           >
                             <Text style={styles.scanBtnIcon}>📷</Text>
@@ -425,5 +429,21 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontSize: 11,
     fontWeight: '700',
+  },
+  activityRowLocked: {
+    backgroundColor: '#F8FAFC',
+    borderColor: '#F1F5F9',
+    opacity: 0.7,
+  },
+  lockedTag: {
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    borderRadius: 12,
+    minWidth: 76,
+    alignItems: 'center',
+  },
+  lockedTagText: {
+    fontSize: 18,
   },
 });

@@ -101,6 +101,7 @@ export const AppProvider = ({ children }) => {
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isCertificateOpen, setIsCertificateOpen] = useState(false);
   const [targetScanFacultyId, setTargetScanFacultyId] = useState(null);
+  const [targetScanActivityId, setTargetScanActivityId] = useState(null);
   const [pendingStaffScan, setPendingStaffScan] = useState(null);
   const [staffSession, setStaffSession] = useState(null); // { facultyId, facultyCode, facultyName, facultyColor, facultyBadge }
 
@@ -427,6 +428,8 @@ export const AppProvider = ({ children }) => {
         setIsCertificateOpen,
         targetScanFacultyId,
         setTargetScanFacultyId,
+        targetScanActivityId,
+        setTargetScanActivityId,
         pendingStaffScan,
         setPendingStaffScan,
         staffSession,

@@ -16,7 +16,7 @@ export default function RegistrationModal({ visible, onClose }) {
   const { userProfile, registerUser } = useApp();
   const [name, setName] = useState(userProfile.name || '');
   const [school, setSchool] = useState(userProfile.school || '');
-  const [selectedAvatarId, setSelectedAvatarId] = useState(userProfile.avatarId || 'gear-bot');
+  const [selectedAvatarId, setSelectedAvatarId] = useState(userProfile.avatarId || 'male');
 
   const handleSubmit = () => {
     registerUser(name, school, selectedAvatarId);
@@ -58,29 +58,34 @@ export default function RegistrationModal({ visible, onClose }) {
               />
             </View>
 
-            {/* Avatar Selector */}
-            <Text style={styles.sectionHeader}>🤖 Choose Your Avatar</Text>
-            <Text style={styles.sectionSub}>This avatar will follow your GPS on the live map!</Text>
+            {/* Gender Selector */}
+            <Text style={styles.sectionHeader}>Choose Gender</Text>
+            <View style={styles.genderRow}>
+              <TouchableOpacity
+                style={[
+                  styles.genderCard,
+                  selectedAvatarId === 'male' && styles.genderCardSelectedMale,
+                ]}
+                onPress={() => setSelectedAvatarId('male')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.genderIcon}>👦</Text>
+                <Text style={[styles.genderLabel, selectedAvatarId === 'male' && { color: '#3B82F6' }]}>Male</Text>
+                {selectedAvatarId === 'male' && <Text style={[styles.genderCheck, { backgroundColor: '#3B82F6' }]}>✓</Text>}
+              </TouchableOpacity>
 
-            <View style={styles.avatarGrid}>
-              {AVATARS.map((item) => {
-                const isSelected = selectedAvatarId === item.id;
-                return (
-                  <TouchableOpacity
-                    key={item.id}
-                    style={[
-                      styles.avatarCard,
-                      { backgroundColor: item.bgColor },
-                      isSelected && [styles.avatarCardSelected, { borderColor: item.color }],
-                    ]}
-                    onPress={() => setSelectedAvatarId(item.id)}
-                    activeOpacity={0.8}
-                  >
-                    {isSelected && <Text style={styles.checkMark}>✓</Text>}
-                    <Text style={styles.avatarIcon}>{item.icon}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              <TouchableOpacity
+                style={[
+                  styles.genderCard,
+                  selectedAvatarId === 'female' && styles.genderCardSelectedFemale,
+                ]}
+                onPress={() => setSelectedAvatarId('female')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.genderIcon}>👧</Text>
+                <Text style={[styles.genderLabel, selectedAvatarId === 'female' && { color: '#EC4899' }]}>Female</Text>
+                {selectedAvatarId === 'female' && <Text style={[styles.genderCheck, { backgroundColor: '#EC4899' }]}>✓</Text>}
+              </TouchableOpacity>
             </View>
 
             <View style={{ height: 24 }} />
@@ -164,53 +169,63 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: '#1E293B',
-  },
-  sectionSub: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
     marginBottom: 14,
   },
-  avatarGrid: {
+  genderRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
+    gap: 14,
     justifyContent: 'center',
   },
-  avatarCard: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+  genderCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    paddingVertical: 24,
     alignItems: 'center',
-    justifyContent: 'center',
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: '#E2E8F0',
     position: 'relative',
-  },
-  avatarCardSelected: {
-    borderWidth: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  checkMark: {
+  genderCardSelectedMale: {
+    borderColor: '#3B82F6',
+    backgroundColor: '#EFF6FF',
+    shadowColor: '#3B82F6',
+    shadowOpacity: 0.2,
+    elevation: 4,
+  },
+  genderCardSelectedFemale: {
+    borderColor: '#EC4899',
+    backgroundColor: '#FDF2F8',
+    shadowColor: '#EC4899',
+    shadowOpacity: 0.2,
+    elevation: 4,
+  },
+  genderIcon: {
+    fontSize: 52,
+    marginBottom: 8,
+  },
+  genderLabel: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#94A3B8',
+  },
+  genderCheck: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: '#10B981',
+    top: 10,
+    right: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     color: '#FFFFFF',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold',
     textAlign: 'center',
-    lineHeight: 20,
-  },
-  avatarIcon: {
-    fontSize: 42,
+    lineHeight: 22,
   },
   footer: {
     padding: 16,
